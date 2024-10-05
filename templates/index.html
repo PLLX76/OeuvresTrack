@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OeuvresTrack - Home</title>
+    <link rel="stylesheet" href="/static/css/index.css" />
+    <meta
+      name="description"
+      content="OeuvresTrack - Gérez facilement vos œuvres préférées avec des filtres pour films, séries, livres et bien plus. Suivez votre progression et découvrez des informations détaillées sur chaque contenu"
+    />
+
+    <link type="text/plain" rel="author" href="/humans.txt" />
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      crossorigin
+      href="https://fonts.googleapis.com/css2?family=Roboto&family=Tilt+Neon&family=Poppins&display=swap"
+      rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
+    />
+    <script defer src="/static/js/index.js"></script>
+    
+    <link rel="manifest" href="/manifest.json" />
+  </head>
+  <body class="preload">
+    <main>
+      {% if 'action' in request.args %}
+      <div id="modal-back" style="display: block"></div>
+      {% else %}
+      <div id="modal-back"></div>
+      {% endif %}
+      <nav>
+        <div>
+          <img
+            src="/static/icons/logo_mini.svg"
+            alt="Logo OeuvresTrack"
+            id="logo"
+          />
+          <h1>OeuvresTrack</h1>
+        </div>
+        {% if session['logged_in'] != True %}
+        <button id="login-btn">Se connecter</button>
+        {% endif %}
+      </nav>
+      <section id="description">
+        <b>ŒuvresTrack - Ne Ratez Plus Jamais Une Sortie !</b> <br />
+        <br />
+        ŒuvresTrack est votre allié ultime pour rester à jour sur les dernières
+        sorties de vos films, séries, livres, et bien plus encore. Conçu pour
+        vous simplifier la vie, ce site intuitif vous permet de suivre
+        facilement votre progression et d'être averti dès qu'une suite est
+        disponible. Fini les oublis et les recherches interminables : avec
+        ŒuvresTrack, vous avez tout sous contrôle. <br />
+        <br />
+        <b>Fonctionnalités Clés :</b> <br />
+        <br />
+        - <b>Alertes de Sortie en Temps Réel :</b> Recevez des notifications
+        précises sur les nouvelles sorties de vos œuvres favorites. Que ce soit
+        un nouvel épisode, une saison, ou un livre, ŒuvresTrack vous avertit dès
+        que c'est disponible pour ne jamais manquer un seul instant. <br />
+
+        - <b>Interface Simple et Efficace :</b> Profitez d’une interface épurée
+        qui met l’accent sur l’essentiel. Accédez en un clin d’œil aux
+        informations qui comptent vraiment, sans distractions inutiles.
+        ŒuvresTrack est pensé pour une utilisation rapide et intuitive. <br />
+
+        - <b>Gestion Personnalisée de Vos Listes :</b> Organisez vos films,
+        séries, et livres dans des listes personnalisées pour garder une vue
+        claire sur ce que vous avez vu, ce que vous suivez, et ce que vous
+        attendez avec impatience. <br />
+
+        - <b>Suivi de Progression Rapide :</b> D’un simple clic, marquez vos
+        œuvres comme vues ou terminées. Visualisez instantanément votre
+        progression et reprenez là où vous vous étiez arrêté, sans effort.
+        <br />
+
+        - <b>Filtres Intelligents :</b> Filtrez facilement vos œuvres par statut
+        (à voir, en cours, terminé) pour gérer au mieux votre temps et vos
+        envies. Trouvez en un instant ce qui correspond à votre mood du moment.
+        <br />
+
+        ŒuvresTrack est conçu pour les passionnés qui veulent se concentrer sur
+        l’essentiel : profiter de leurs œuvres préférées sans perdre de temps.
+        Facile à utiliser, pratique et pensé pour vous accompagner au quotidien,
+        ŒuvresTrack vous offre une expérience de suivi simplifiée et
+        personnalisée. <br />
+        <br />
+        <b
+          >ŒuvresTrack – Parce que rester à jour n’a jamais été aussi facile.</b
+        >
+      </section>
+      <section id="videos"></section>
+
+      {% if 'action' in request.args %}
+      <div id="modal-login" style="transform: scale(1);">
+      {% else %}
+      <div id="modal-login">
+      {% endif %}
+        <div>
+          {% if request.args["action"] == "register" %}
+          <div>
+            <h2 id="modal-login-title">S'enregistrer</h2>
+            <button id="change-mode" class="roboto">Se connecter</button>
+          </div>
+          {% else %}
+          <div>
+            <h2 id="modal-login-title">Se connecter</h2>
+            <button id="change-mode" class="roboto">S'enregistrer</button>
+          </div>
+          {% endif %}
+          <button id="close-modal-login">
+            <img loading="lazy" src="/static/icons/close.svg" alt="Fermer" />
+          </button>
+        </div>
+        <div id="modal-login-main">
+          <p id="error">{{ error }}</p>
+          {% if request.args["action"] == "register" %}
+          <form method="post" action="/?action=login" id="login">
+          {% else %}
+          <form method="post" action="/?action=login" id="login" class="open">
+          {% endif %}
+            <input
+              type="text"
+              name="username"
+              placeholder="Identifiant/Email"
+              value="{{username}}"
+              required
+            />
+            <input
+              type="password"
+              name="password"
+              placeholder="Mot de passe"
+              required
+            />
+            <button type="submit">Se connecter</button>
+          </form>
+
+          {% if request.args["action"] == "register" %}
+          <form
+            action="/?action=register"
+            method="post"
+            id="register"
+            onsubmit="return checkPasswords()"
+            class="open"
+          >
+          {% else %}
+          <form
+            action="/?action=register"
+            method="post"
+            id="register"
+            onsubmit="return checkPasswords()"
+          >
+          {% endif %}
+            <label for="register-username">Identifiant</label>
+            <input
+              type="text"
+              name="username"
+              id="register-username"
+              placeholder="Identifiant"
+              value="{{username}}"
+              required
+              autocomplete="username"
+            />
+            <label for="register-email">Adresse email</label>
+            <input
+              type="email"
+              name="email"
+              id="register-email"
+              placeholder="Adresse email"
+              value="{{email}}"
+              required
+              autocomplete="email"
+            />
+            <label for="register-password">Mot de passe</label>
+            <input
+              type="password"
+              name="password"
+              id="register-password"
+              placeholder="Mot de passe"
+              required
+              autocomplete="new-password"
+            />
+            <label for="register-password-confirm"
+              >Confirmer le mot de passe</label
+            >
+            <input
+              type="password"
+              name="password-confirm"
+              id="register-password-confirm"
+              placeholder="Confirmer le mot de passe"
+              required
+              autocomplete="new-password"
+            />
+            <button type="submit">Créer un compte</button>
+          </form>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

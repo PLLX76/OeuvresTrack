@@ -1,0 +1,289 @@
+#settings {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+#settings-categories {
+  display: none;
+}
+#settings-contents {
+  padding: 8px;
+  font-family: "Poppins", sans-serif;
+  width: calc(100% - 15px);
+}
+#settings-contents hr {
+  margin: 20px 0;
+  border: 1px solid lightsteelblue;
+}
+#settings-contents > section {
+  margin-top: 20px;
+}
+#settings-contents > section:first-of-type {
+  margin-top: 0;
+}
+#settings-contents > section:last-of-type {
+  margin-bottom: 200px;
+}
+#settings-contents > section > h2 {
+  margin-bottom: 10px;
+}
+#settings-account-error {
+  color: red;
+  font-size: 15px;
+  margin-top: 10px;
+  border-radius: 5px;
+  margin-left: 5px;
+}
+#settings-account-success {
+  color: green;
+  font-size: 15px;
+  margin-top: 10px;
+  border-radius: 5px;
+  margin-left: 5px;
+}
+.settings-field {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  gap: 5px;
+  margin: 10px 0;
+  font-size: 15px;
+}
+.settings-field select {
+  width: 100%;
+  padding: 5px;
+  border-radius: 5px;
+  border: 2px solid lightsteelblue;
+}
+.settings-field label {
+  width: 300px;
+  -webkit-box-flex: 1;
+  -ms-flex-positive: 1;
+  flex-grow: 1;
+}
+.settings-field input[type="text"],
+.settings-field input[type="email"],
+.settings-field input[type="password"] {
+  width: 100%;
+  padding: 5px;
+  border-radius: 5px;
+  border: 2px solid lightsteelblue;
+}
+.settings-field input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+}
+.settings-field button {
+  border: none;
+  background-color: transparent;
+  outline: none;
+}
+.settings-field button:hover {
+  background-color: lightgray;
+  border-radius: 5px;
+}
+.settings-field button img {
+  width: 20px;
+  height: 20px;
+}
+.settings-btn {
+  display: block;
+  width: calc(100% - 20px);
+  margin-top: 20px;
+  padding: 5px;
+  border-radius: 10px;
+  border: none;
+}
+#settings-logout {
+  background-color: lightcoral;
+  color: white;
+}
+#password-save {
+  background-color: lightgreen;
+  font-family: "Poppins", sans-serif;
+  height: 35px;
+  font-size: 15px;
+  text-align: left;
+  text-decoration: underline;
+}
+#settings-dictionary-container {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  gap: 5px;
+  width: 100%;
+}
+.settings-dictionary {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  gap: 4px;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  width: 100%;
+  position: relative;
+}
+.settings-dictionary-select {
+  width: 150px;
+  padding: 5px;
+  border-radius: 5px;
+  border: 2px solid lightsteelblue;
+  height: 30px;
+  background-color: white;
+}
+.settings-dictionary input[type="text"] {
+  -webkit-box-flex: 1;
+  -ms-flex-positive: 1;
+  flex-grow: 1;
+  padding: 5px;
+  border-radius: 5px;
+  border: 2px solid lightsteelblue;
+  height: 16px;
+}
+.settings-dictionary button {
+  border: none;
+  background-color: transparent;
+  outline: none;
+}
+
+.settings-dictionary input[type="checkbox"] {
+  width: 25px;
+  height: 25px;
+}
+.settings-dictionary img {
+  height: 100%;
+  cursor: pointer;
+}
+.settings-dictionary p {
+  display: none;
+  width: 200px;
+  padding: 5px;
+  border-radius: 5px;
+  border: 2px solid lightsteelblue;
+  position: absolute;
+  background-color: white;
+  left: calc(100% - 205px);
+  top: calc(100% + 5px);
+  z-index: 4;
+}
+.settings-dictionary.dragging {
+  opacity: 0.5;
+}
+.settings-dictionary img:first-of-type {
+  cursor: -webkit-grab;
+  cursor: grab;
+}
+.settings-dictionary .info-icon:hover ~ p {
+  display: block;
+}
+#add-lexicon-line {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 5px;
+  border-radius: 5px;
+  border: 2px solid lightsteelblue;
+  background-color: white;
+  cursor: pointer;
+  margin: 10px 0;
+  position: absolute;
+  right: 10px;
+}
+@media screen and (min-width: 800px) {
+  .settings-dictionary select {
+    width: 200px;
+  }
+  .settings-dictionary {
+    gap: 5px;
+  }
+  #settings-contents {
+    padding: 10px;
+  }
+
+  #settings-categories {
+    display: block;
+    position: sticky;
+    top: 2px;
+    left: 0;
+    width: calc(100% - 15px);
+    max-width: 400px;
+
+    font-family: "Poppins", sans-serif;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    padding: 5px;
+    border: 2px solid lightsteelblue;
+    border-top: 0;
+    height: calc(100vh - 14px);
+  }
+  *.settings-category {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    width: calc(100% - 20px);
+    margin: 10px 0;
+    padding: 5px;
+    font-size: 15px;
+    border-radius: 10px;
+    gap: 5px;
+    color: black;
+    text-decoration: underline;
+  }
+  *.settings-category img {
+    width: 20px;
+    height: 20px;
+  }
+  *.settings-category:hover {
+    cursor: pointer;
+    background-color: lightgray;
+  }
+}
+[data-theme="dark"] {
+  .settings-dictionary-text,
+  .settings-dictionary-select,
+  #settings-theme {
+    background-color: rgb(30, 30, 30);
+  }
+  *.settings-category:hover {
+    background-color: rgb(50, 50, 50);
+  }
+  #password-save {
+    background-color: rgba(144, 238, 144, 0.6);
+  }
+  #settings-logout {
+    background-color: rgba(240, 128, 128, 0.6);
+  }
+}

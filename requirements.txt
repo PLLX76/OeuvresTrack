@@ -1,0 +1,12 @@
+flask
+flask-minify
+flask-compress
+Flask-Caching
+cloudscraper
+pymongo
+passlib
+pywebpush
+flask-talisman
+flask-limiter
+discord_webhook
+python-dotenv

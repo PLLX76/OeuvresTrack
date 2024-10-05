@@ -1,0 +1,7 @@
+logo
+.venv
+.vscode
+__pycache__
+env.bat
+reset_db.py
+.env

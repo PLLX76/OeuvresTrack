@@ -1,0 +1,8 @@
+/* SITE */
+    Site name: OeuvresTrack
+    Site URL: http://oeuvrestrack.vercel.app
+    Built with: Flask
+
+    Editor: PLLX76
+    Discord : @pllx76
+    Location: France

@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OeuvresTrack - App Home</title>
+    <meta
+      name="description"
+      content="OeuvresTrack - Gérez facilement vos œuvres préférées avec des filtres pour films, séries, livres et bien plus. Suivez votre progression et découvrez des informations détaillées sur chaque contenu."
+    />
+
+    <link rel="stylesheet" href="/static/css/home.css" />
+    <link
+      rel="stylesheet"
+      href="/static/css/home_secondary.css"
+      media="print"
+      onload="this.media='all'"
+    />
+
+    <link type="text/plain" rel="author" href="/humans.txt" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto&family=Tilt+Neon&family=Poppins&display=swap"
+      rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
+    />
+
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+
+    <script defer src="/static/js/home.js"></script>
+    <link rel="manifest" href="/manifest.json" />
+
+    <link rel="canonical" href="{{ url }}" />
+  </head>
+  <body class="preload">
+    <div id="sidebar">
+      <div id="sidebar-header">
+        <button id="close-btn">
+          <img loading="lazy" src="/static/icons/close.svg" alt="Fermer" />
+        </button>
+        <img loading="lazy" src="/static/icons/logo_mini.svg" alt="Logo" />
+        <h1 class="tilt-neon">OeuvresTrack</h1>
+      </div>
+      <div id="filtres">
+        <button class="filtre selected" data-filtre="all">
+          <p>Tous</p>
+        </button>
+        <button class="filtre" data-filtre="movie">
+          <p>Films</p>
+        </button>
+        <button class="filtre" data-filtre="tv">
+          <p>Séries</p>
+        </button>
+        <button class="filtre" data-filtre="book">
+          <p>Livres</p>
+        </button>
+        <button class="filtre" data-filtre="onwatch">
+          <p>En Cours</p>
+        </button>
+        <button class="filtre" data-filtre="towatch">
+          <p>Non Commencé</p>
+        </button>
+        <button class="filtre" data-filtre="done">
+          <p>Termine</p>
+        </button>
+        <button class="filtre" data-filtre="giveup">
+          <p>Abandonné</p>
+        </button>
+      </div>
+      <div id="link-box">
+        <button id="tierlist-btn">
+          <img src="/static/icons/view_list.svg" alt="Icon view list" />
+          <p class="poppins">Votre TierList</p>
+        </button>
+        <button id="settings-btn">
+          <img src="/static/icons/settings.svg" alt="Icon settings" />
+          <p class="poppins">Paramètres</p>
+        </button>
+      </div>
+    </div>
+    <div id="modal-back"></div>
+    <main id="main">
+      <nav>
+        <button id="menu-btn">
+          <img src="/static/icons/menu.svg" alt="Menu" />
+        </button>
+        <input
+          type="search"
+          placeholder="Rechercher..."
+          id="search"
+          name="search"
+          autocomplete="off"
+        />
+      </nav>
+
+      <div id="contents">
+        <div id="loader">
+          <span class="loader__element"></span>
+          <span class="loader__element"></span>
+          <span class="loader__element"></span>
+        </div>
+      </div>
+      <div
+        id="modal-edit"
+        class="modal {% if modalEdit %}open native{% endif %}"
+        data-id="{{modalEditData['id']}}"
+        data-type="{{modalEditData['type']}}"
+      >
+        <div>
+          <h2 class="roboto" id="modal-edit-title">TITRE</h2>
+          <button id="close-modal-edit">
+            <img loading="lazy" src="/static/icons/close.svg" alt="Fermer" />
+          </button>
+        </div>
+        <section id="info">
+          <picture id="modal-edit-picture"> </picture>
+          <p id="description"></p>
+        </section>
+        <section id="manage-section">
+          <button id="delete-library" style="display: none">
+            <img
+              src="/static/icons/delete.svg"
+              alt="Icone supprimer"
+              loading="lazy"
+            />
+            <p>Supprimer de votre librairie</p>
+          </button>
+          <button id="add-library">
+            <img
+              src="/static/icons/add.svg"
+              alt="Icone ajouter"
+              loading="lazy"
+            />
+            <p>Ajouter a votre librairie</p>
+          </button>
+          <button id="give-up">
+            <img
+              src="/static/icons/do_not_disturb_on.svg"
+              alt="Icone ne pas deranger"
+              loading="lazy"
+            />
+            <p>Abandonner (Ne plus suivre)</p>
+          </button>
+          <button id="ungive-up">
+            <img
+              src="/static/icons/notification_add.svg"
+              alt="Icone Ajouter au notification"
+              loading="lazy"
+            />
+            <p>Reprendre (Suivre)</p>
+          </button>
+          <label
+            >Votre Note :
+            <select id="modal-edit-rating">
+              <option value="" selected>Aucune Note</option>
+              <option value="S">Rang S</option>
+              <option value="A">Rang A</option>
+              <option value="B">Rang B</option>
+              <option value="C">Rang C</option>
+              <option value="D">Rang D</option>
+              <option value="E">Rang E</option>
+              <option value="F">Rang F</option>
+            </select></label
+          >
+        </section>
+        <section id="elements"></section>
+      </div>
+      <div id="modal-add" class="modal {% if modalAdd %}open native{% endif %}">
+        <div>
+          <h2 id="modal-add-title" class="roboto">Ajouter des oeuvres</h2>
+          <button id="close-modal-add">
+            <img loading="lazy" src="/static/icons/close.svg" alt="Fermer" />
+          </button>
+        </div>
+        <div id="modal-add-choice-btn">
+          <button class="modal-add-btn" data-type="movie">
+            <img src="/static/icons/movie.svg" alt="" />
+            <p>Films</p>
+          </button>
+          <button class="modal-add-btn" data-type="tv">
+            <img src="/static/icons/tv.svg" alt="" />
+            <p>Séries</p>
+          </button>
+          <button class="modal-add-btn" data-type="book">
+            <img src="/static/icons/library_books.svg" alt="" />
+            <p>Livres</p>
+          </button>
+        </div>
+        <div id="modal-add-content">
+          <input
+            placeholder="Rechercher..."
+            type="search"
+            name="modal-add-search"
+            id="modal-add-search"
+            autocomplete="off"
+          />
+          <div id="results"></div>
+        </div>
+      </div>
+      <div
+        id="modal-tierlist"
+        class="modal {% if tierlist %}open native{% endif %}"
+      >
+        <div>
+          <h2 id="modal-tierlist-title" class="roboto">Votre TierList</h2>
+          <button id="close-modal-tierlist">
+            <img loading="lazy" src="/static/icons/close.svg" alt="Fermer" />
+          </button>
+        </div>
+        <div id="tierlist">
+          <div id="tierlist-container">
+            <div class="row" id="row-s">
+              <div class="tierlist-rank">
+                <h2>S</h2>
+              </div>
+              <div data-rank="S" class="container"></div>
+            </div>
+            <div class="row" id="row-a">
+              <div class="tierlist-rank">
+                <h2>A</h2>
+              </div>
+              <div data-rank="A" class="container"></div>
+            </div>
+            <div class="row" id="row-b">
+              <div class="tierlist-rank">
+                <h2>B</h2>
+              </div>
+              <div data-rank="B" class="container"></div>
+            </div>
+            <div class="row" id="row-c">
+              <div class="tierlist-rank">
+                <h2>C</h2>
+              </div>
+              <div data-rank="C" class="container"></div>
+            </div>
+            <div class="row" id="row-d">
+              <div class="tierlist-rank">
+                <h2>D</h2>
+              </div>
+              <div data-rank="D" class="container"></div>
+            </div>
+            <div class="row" id="row-e">
+              <div class="tierlist-rank">
+                <h2>E</h2>
+              </div>
+              <div data-rank="E" class="container"></div>
+            </div>
+            <div class="row" id="row-f">
+              <div class="tierlist-rank">
+                <h2>F</h2>
+              </div>
+              <div data-rank="F" class="container"></div>
+            </div>
+          </div>
+          <div id="non-classed">
+            <h2>Non classé</h2>
+            <div data-rank="" class="remainder container"></div>
+          </div>
+        </div>
+      </div>
+      <div
+        id="modal-settings"
+        class="modal {% if setting %}open native{% endif %}"
+      >
+        <div>
+          <h2 id="modal-settings-title" class="roboto">Paramètres</h2>
+          <button id="close-modal-settings">
+            <img loading="lazy" src="/static/icons/close.svg" alt="Fermer" />
+          </button>
+        </div>
+        <div id="settings">
+          <div id="settings-categories">
+            <h2>Catégories</h2>
+            <div id="settings-category-list ">
+              <a href="#settings-account" class="settings-category">
+                <img src="/static/icons/account_circle.svg" alt="" />
+                <p>Mon compte</p>
+              </a>
+              <a href="#settings-general" class="settings-category">
+                <img src="/static/icons/settings.svg" alt="" />
+                <p>Général</p>
+              </a>
+              <a href="#settings-lexique" class="settings-category">
+                <img src="/static/icons/dictionary.svg" alt="" />
+                <p>Lexique</p>
+              </a>
+            </div>
+          </div>
+          <div id="settings-contents">
+            <section id="settings-account" class="">
+              <h2>Mon compte</h2>
+              <p id="settings-account-error"></p>
+              <p id="settings-account-success"></p>
+              <div class="settings-field">
+                <label for="settings-username">Nom d'utilisateur</label>
+                <input
+                  type="text"
+                  id="settings-username"
+                  name="username"
+                  disabled
+                  value="{{ session['user']['name'] }}"
+                  autocomplete="username"
+                />
+                <button id="edit-username">
+                  <img
+                    src="/static/icons/edit.svg"
+                    alt="Edit name icon"
+                    loading="lazy"
+                  />
+                </button>
+              </div>
+              <div class="settings-field">
+                <label for="settings-email">Email</label>
+                <input
+                  type="email"
+                  id="settings-email"
+                  name="email"
+                  disabled
+                  value="{{ session['user']['email'] }}"
+                  autocomplete="email"
+                />
+                <button id="edit-email">
+                  <img
+                    src="/static/icons/edit.svg"
+                    alt="Edit email icon"
+                    loading="lazy"
+                  />
+                </button>
+              </div>
+              <hr />
+              <h3>Changer votre mot de passe</h3>
+              <div class="settings-field password-field">
+                <label for="settings-oldpass">Votre mot de passe</label>
+
+                <input
+                  type="password"
+                  id="settings-oldpass"
+                  name="oldpass"
+                  autocomplete="current-password"
+                />
+              </div>
+              <div class="settings-field password-field">
+                <label for="settings-newpass">Votre nouveau mot de passe</label>
+                <input
+                  type="password"
+                  id="settings-newpass"
+                  name="newpass"
+                  autocomplete="new-password"
+                />
+              </div>
+              <div class="settings-field password-field">
+                <label for="settings-confirmpass"
+                  >Confirmez nouveau votre mot de passe</label
+                >
+                <input
+                  type="password"
+                  id="settings-confirmpass"
+                  name="confirmpass"
+                  autocomplete="new-password"
+                />
+              </div>
+              <button id="password-save" class="settings-btn">
+                Enregistrer
+              </button>
+              <hr />
+              <a href="/logout" class="settings-btn" id="settings-logout"
+                >Se deconnecter</a
+              >
+            </section>
+            <section id="settings-general" class="">
+              <h2>Général</h2>
+              <div class="settings-field">
+                <label for="settings-theme">Thème</label>
+                <select id="settings-theme">
+                  <option value="system">Système</option>
+                  <option value="light">Clair</option>
+                  <option value="dark">Sombre</option>
+                </select>
+              </div>
+              <div class="settings-field">
+                <input
+                  type="checkbox"
+                  id="settings-adult"
+                  name="adult-result"
+                  data-key="adult-result"
+                />
+                <label for="settings-adult"
+                  >Activer les resultats pour adulte dans la section ajouts. En
+                  cochant cette option vous confirmez avoir plus de 18
+                  ans.</label
+                >
+              </div>
+              <div class="settings-field">
+                <input
+                  type="checkbox"
+                  id="settings-ignore-overs"
+                  name="ignore-overs"
+                  checked
+                  data-key="ignore-overs"
+                />
+                <label for="settings-ignore-overs"
+                  >Ignore les épisodes hors sériés : dans la dertermination du
+                  status.</label
+                >
+              </div>
+            </section>
+            <section id="settings-dictionary" class="selected">
+              <h2>Lexique</h2>
+              <div id="settings-dictionary-container"></div>
+              <button id="add-lexicon-line" onclick="addLexiconLine()">
+                <img src="/static/icons/add.svg" alt="Bouton d'ajout" />
+                <p>Ajouter une ligne</p>
+              </button>
+            </section>
+          </div>
+        </div>
+      </div>
+      <button id="add-btn">
+        <img src="/static/icons/add.svg" alt="Bouton d'ajout" />
+        <p>Ajouter une oeuvre</p>
+      </button>
+    </main>
+  </body>
+</html>
