@@ -133,7 +133,15 @@ if not debug:
     limiter = Limiter(
         get_remote_address,
         app=app,
-        default_limits=["300 per day", "80 per hour"],
+        default_limits=["300 per day", "100 per hour"],
+        storage_uri=os.getenv("MONGODB_URI"),
+        strategy="fixed-window",
+    )
+else:
+    limiter = Limiter(
+        get_remote_address,
+        app=app,
+        default_limits=["3000 per day", "800 per hour"],
         storage_uri=os.getenv("MONGODB_URI"),
         strategy="fixed-window",
     )
@@ -370,6 +378,7 @@ def api_user_password():
 @app.route("/api/user/list", methods=["GET"])
 @login_required
 @no_cache
+@limiter.limit("10 per minute; 150 per hour; 300 per day")
 def get_user_list():
     return get_user_ulist(session["user"]["id"])
 
@@ -377,6 +386,7 @@ def get_user_list():
 @app.route("/api/user/list/hard", methods=["GET"])
 @login_required
 @no_cache
+@limiter.limit("10 per minute; 30 per hour; 50 per day")
 def hard_reload_endpoint():
     return hard_reload(session["user"]["id"])
 
@@ -384,6 +394,7 @@ def hard_reload_endpoint():
 @app.route("/api/user/add/<type>/<id>", methods=["GET"])
 @login_required
 @no_cache
+@limiter.limit("10 per minute; 150 per hour; 300 per day")
 def add_user_list(type: str, id: str):
     if ["movie", "tv", "book", "books"].count(type) == 0:
         abort(400)
@@ -406,6 +417,7 @@ def delete_user_list(type: str, id: str):
 @app.route("/api/user/update/<type>/<id>", methods=["POST"])
 @login_required
 @no_cache
+@limiter.limit("20 per minute; 200 per hour; 400 per day")
 def update_user_list(type: str, id: str):
     if ["movie", "tv", "book", "books"].count(type) == 0:
         abort(400)
@@ -424,6 +436,7 @@ def update_user_list(type: str, id: str):
 @app.route("/api/user/get/<type>/<id>", methods=["GET"])
 @login_required
 @no_cache
+@limiter.limit("20 per minute; 200 per hour; 400 per day")
 def get_user_content(type: str, id: str):
     if ["movie", "tv", "book", "books"].count(type) == 0:
         abort(400)
@@ -444,6 +457,7 @@ def togle_content_giveup(type, id):
 @app.route("/api/user/rank/<type>/<id>", methods=["POST"])
 @login_required
 @no_cache
+@limiter.limit("20 per minute; 200 per hour; 400 per day")
 def set_content_rank(type, id):
     if ["movie", "tv", "book", "books"].count(type) == 0:
         abort(400)

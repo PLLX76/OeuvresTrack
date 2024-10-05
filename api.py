@@ -918,7 +918,7 @@ def add_ulist(user_id: int, type: str, id: str):
     if dcatalog is None:
         return False
 
-    text = get_ulist_text(dcatalog)
+    text = get_ulist_text(dcatalog, lexicon=get_lexicon(user_id))
 
     db.ulist.update_one(
         {"id": user_id},

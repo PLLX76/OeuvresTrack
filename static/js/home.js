@@ -276,12 +276,30 @@ function getUserContentData(type, id) {
     });
 }
 
-const closeModalEdit = document.getElementById("close-modal-edit");
-closeModalEdit.addEventListener("click", () => {
-  modalEdit.classList.toggle("open");
+var haveListChange = false;
+var sendUpdatePromise = new Array();
+
+function checkReloadList() {
+  if (haveListChange) {
+    reloadList();
+    haveListChange = false;
+  }
+  sendUpdatePromise = new Array();
+}
+
+function closeModalEditFunc(modify_history = true) {
+  modalEdit.classList.remove("open");
   modalEdit.classList.remove("native");
-  window.history.pushState({ modal: "" }, "", "/app/");
-});
+
+  if (modify_history) {
+    window.history.pushState({ modal: "" }, "", "/app/");
+  }
+
+  Promise.all(sendUpdatePromise).then(checkReloadList);
+}
+
+const closeModalEdit = document.getElementById("close-modal-edit");
+closeModalEdit.addEventListener("click", closeModalEditFunc);
 
 const BtnAdd = document.getElementById("add-btn");
 const modalAddChoiceBtn = document.getElementById("modal-add-choice-btn");
@@ -347,11 +365,13 @@ async function updateSelectedEpisodes(nb_selected, season) {
   }
 
   // On attend que sendSelectedData soit terminée
-  await sendSelectedData(
-    modalEdit.dataset.id,
-    modalEdit.dataset.type,
-    selectedSeason.dataset.season_number,
-    season
+  sendUpdatePromise.push(
+    await sendSelectedData(
+      modalEdit.dataset.id,
+      modalEdit.dataset.type,
+      selectedSeason.dataset.season_number,
+      season
+    )
   );
 }
 
@@ -411,8 +431,8 @@ async function sendSelectedData(id, type, season_number = null, season = null) {
             deleteLibraryBtn.style.display = "flex";
             giveUpBtn.style.display = "flex";
           }
+          haveListChange = true;
           resolve(data);
-          reloadList();
         })
         .catch((error) => {
           console.error("Erreur lors de la requête :", error);
@@ -491,18 +511,22 @@ function modalEditAddListener(type) {
         seasonSlider.value = nb_selected;
         seasonNumber.value = nb_selected;
 
-        sendSelectedData(
-          modalEdit.dataset.id,
-          modalEdit.dataset.type,
-          season.querySelector(".subelements").dataset.season_number,
-          Array.prototype.indexOf.call(season.parentNode.children, season)
+        sendUpdatePromise.push(
+          sendSelectedData(
+            modalEdit.dataset.id,
+            modalEdit.dataset.type,
+            season.querySelector(".subelements").dataset.season_number,
+            Array.prototype.indexOf.call(season.parentNode.children, season)
+          )
         );
       });
     }
   } else {
     const element = document.querySelector("#modal-edit .element");
     element.addEventListener("change", () => {
-      sendSelectedData(modalEdit.dataset.id, modalEdit.dataset.type);
+      sendUpdatePromise.push(
+        sendSelectedData(modalEdit.dataset.id, modalEdit.dataset.type)
+      );
     });
   }
 }
@@ -778,19 +802,25 @@ async function openModalEdit(data_id, data_type) {
   );
   modalEditAddListener(type);
 }
-function closeAllModals() {
-  modalEdit.classList.remove("open");
-  modalEdit.classList.remove("native");
+function closeAllModals(modify_history = false) {
+  closeModalEditFunc(false);
+
   modalAdd.classList.remove("open");
   modalAdd.classList.remove("fullscreen");
   modalAdd.classList.remove("native");
+
   modalTierlist.classList.remove("open");
   modalTierlist.classList.remove("native");
-  if (modalSettings.classList.contains("open")) closeModalSettings();
+
+  if (modalSettings.classList.contains("open")) closeModalSettings(false);
+
+  if (modify_history) {
+    window.history.pushState({ modal: "" }, "", "/app/");
+  }
 }
 document.body.addEventListener("keydown", function (e) {
   if (e.key == "Escape") {
-    closeAllModals();
+    closeAllModals(true);
   }
 });
 
@@ -946,32 +976,42 @@ async function reloadList(hard = false) {
 function addList(type, id) {
   const url = "/api/user/add/" + type + "/" + id;
 
-  return fetch(url)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`Erreur HTTP ! statut : ${response.status}`);
-      }
-      return response.json();
-    })
-    .then((data) => {
-      return data;
-    })
-    .catch((error) => {
-      console.error("Erreur lors de la récupération des données :", error);
-    });
+  return new Promise((resolve, reject) => {
+    fetch(url)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Erreur HTTP ! statut : ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        resolve(data);
+      })
+      .catch((error) => {
+        console.error("Erreur lors de la récupération des données :", error);
+        reject(error);
+      });
+  });
 }
 async function AddLibrary() {
-  let response = await addList(modalEdit.dataset.type, modalEdit.dataset.id);
-  if (response.status == "success") {
-    addLibraryBtn.style.display = "none";
-    deleteLibraryBtn.style.display = "flex";
-    giveUpBtn.style.display = "flex";
+  return new Promise((resolve, reject) => {
+    addList(modalEdit.dataset.type, modalEdit.dataset.id).then((response) => {
+      if (response.status == "success") {
+        addLibraryBtn.style.display = "none";
+        deleteLibraryBtn.style.display = "flex";
+        giveUpBtn.style.display = "flex";
 
-    reloadList();
-  }
+        haveListChange = true;
+
+        resolve(response);
+      } else {
+        reject(response);
+      }
+    });
+  });
 }
 addLibraryBtn.addEventListener("click", () => {
-  AddLibrary();
+  sendUpdatePromise.push(AddLibrary());
 });
 
 function deleteList(type, id) {
@@ -992,16 +1032,25 @@ function deleteList(type, id) {
     });
 }
 async function DeleteLibrary() {
-  let response = await deleteList(modalEdit.dataset.type, modalEdit.dataset.id);
-  if (response.status == "success") {
-    addLibraryBtn.style.display = "flex";
-    deleteLibraryBtn.style.display = "none";
-    giveUpBtn.style.display = "none";
-    reloadList();
-  }
+  return new Promise((resolve, reject) => {
+    deleteList(modalEdit.dataset.type, modalEdit.dataset.id).then(
+      (response) => {
+        if (response.status == "success") {
+          addLibraryBtn.style.display = "flex";
+          deleteLibraryBtn.style.display = "none";
+          giveUpBtn.style.display = "none";
+          haveListChange = true;
+
+          resolve(response);
+        } else {
+          reject(response);
+        }
+      }
+    );
+  });
 }
 deleteLibraryBtn.addEventListener("click", () => {
-  DeleteLibrary();
+  sendUpdatePromise.push(DeleteLibrary());
 });
 
 reloadList();
@@ -1025,32 +1074,44 @@ function toggleGiveUp(type, id) {
 }
 
 async function GiveUp() {
-  let response = await toggleGiveUp(
-    modalEdit.dataset.type,
-    modalEdit.dataset.id
-  );
-  if (response.status == "success") {
-    giveUpBtn.style.display = "none";
-    ungiveUpBtn.style.display = "flex";
-    reloadList();
-  }
+  return new Promise((resolve, reject) => {
+    toggleGiveUp(modalEdit.dataset.type, modalEdit.dataset.id).then(
+      (response) => {
+        if (response.status == "success") {
+          giveUpBtn.style.display = "none";
+          ungiveUpBtn.style.display = "flex";
+          haveListChange = true;
+
+          resolve(response);
+        } else {
+          reject(response);
+        }
+      }
+    );
+  });
 }
 async function UngiveUp() {
-  let response = await toggleGiveUp(
-    modalEdit.dataset.type,
-    modalEdit.dataset.id
-  );
-  if (response.status == "success") {
-    giveUpBtn.style.display = "flex";
-    ungiveUpBtn.style.display = "none";
-    reloadList();
-  }
+  return new Promise((resolve, reject) => {
+    toggleGiveUp(modalEdit.dataset.type, modalEdit.dataset.id).then(
+      (response) => {
+        if (response.status == "success") {
+          giveUpBtn.style.display = "flex";
+          ungiveUpBtn.style.display = "none";
+          haveListChange = true;
+
+          resolve(response);
+        } else {
+          reject(response);
+        }
+      }
+    );
+  });
 }
 ungiveUpBtn.addEventListener("click", () => {
-  UngiveUp();
+  sendUpdatePromise.push(UngiveUp());
 });
 giveUpBtn.addEventListener("click", () => {
-  GiveUp();
+  sendUpdatePromise.push(GiveUp());
 });
 
 async function sendRank(type, id, rank) {
@@ -1079,10 +1140,17 @@ async function sendRank(type, id, rank) {
     });
 }
 async function updateRank(type, id, rank) {
-  let response = await sendRank(type, id, rank);
-  if (response.status == "success") {
-    reloadList();
-  }
+  return new Promise((resolve, reject) => {
+    sendRank(type, id, rank).then((response) => {
+      if (response.status == "success") {
+        haveListChange = true;
+
+        resolve(response);
+      } else {
+        reject(response);
+      }
+    });
+  });
 }
 
 rankSelect.addEventListener("change", () => {
@@ -1197,13 +1265,15 @@ function openModalSettings() {
 
 settingsBtn.addEventListener("click", openModalSettings);
 
-function closeModalSettings() {
+function closeModalSettings(modify_history = true) {
   modalSettings.classList.remove("open");
   modalSettings.classList.remove("native");
   if (havetoUpdateList) {
     reloadList((hard = true));
   }
-  window.history.pushState({ modal: "" }, "", "/app/");
+  if (modify_history) {
+    window.history.pushState({ modal: "" }, "", "/app/");
+  }
 }
 modalSettingsClose.addEventListener("click", closeModalSettings);
 
