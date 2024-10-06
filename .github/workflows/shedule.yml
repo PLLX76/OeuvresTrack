@@ -12,6 +12,7 @@ jobs:
       ENV: production
       MONGODB_URI: ${{ secrets.MONGODB_URI }}
       TMDB_TOKEN: ${{ secrets.TMDB_TOKEN }}
+      VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
