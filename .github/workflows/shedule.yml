@@ -8,6 +8,10 @@ jobs:
   run-script:
     runs-on: ubuntu-latest
 
+    env:
+      ENV: production
+      MONGODB_URI: ${{ secrets.MONGODB_URI }}
+      TMDB_TOKEN: ${{ secrets.TMDB_TOKEN }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
