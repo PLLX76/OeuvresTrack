@@ -72,7 +72,7 @@ self.addEventListener("push", function (event) {
   const title = data.title || "Nouvelle notification";
   const options = {
     body: data.body || "Vous avez une nouvelle notification.",
-    icon: data.icon || "/static/icons/notifications.svg",
+    icon: data.icon || "/static/icons/logo_mini.svg",
     badge: data.badge || undefined,
     data: {
       url: data.url,

@@ -1567,41 +1567,42 @@ def get_lexicon(user_id: int):
 
 def save_subscription_to_db(user_id: int, subscription_data: dict):
     db.users.update_one(
-        {"id": user_id}, {"$set": {"subscription_data": subscription_data}}
+        {"id": user_id}, {"$addToSet": {"subscriptions_data": subscription_data}}
     )
     return {"status": "success"}
 
 
 def get_subscription_from_db(user_id: int):
-    data = db.users.find_one({"id": user_id}, {"subscription_data": 1})
-    if "subscription_data" in data:
-        return data["subscription_data"]
+    data = db.users.find_one({"id": user_id}, {"subscriptions_data": 1})
+    if "subscriptions_data" in data:
+        return data["subscriptions_data"]
     return None
 
 
 def send_notification(user_id, title, body, url=None, icon=None):
     from pywebpush import webpush, WebPushException
 
-    subscription_info = get_subscription_from_db(user_id)
+    subscriptions_info = get_subscription_from_db(user_id)
 
-    if subscription_info is None:
+    if subscriptions_info is None:
         print(
             f"Echec d'envoi de notification : {user_id} subscription_data n'est pas définie"
         )
         return {"status": "error"}
 
-    payload = json.dumps({"title": title, "body": body, "icon": icon, "url": url})
+    for subscription_info in subscriptions_info:
+        payload = json.dumps({"title": title, "body": body, "icon": icon, "url": url})
 
-    try:
-        webpush(
-            subscription_info=subscription_info,
-            data=payload,
-            vapid_private_key=VAPID_PRIVATE_KEY,
-            vapid_claims={"sub": "mailto:paul.a.leroy02@gmail.com"},
-        )
-        print(f"Notification envoyée à {user_id}")
-    except WebPushException as ex:
-        print(f"Echec d'envoi de notification : {ex}")
+        try:
+            webpush(
+                subscription_info=subscription_info,
+                data=payload,
+                vapid_private_key=VAPID_PRIVATE_KEY,
+                vapid_claims={"sub": "mailto:paul.a.leroy02@gmail.com"},
+            )
+            print(f"Notification envoyée à {user_id}")
+        except WebPushException as ex:
+            print(f"Echec d'envoi de notification : {ex}")
 
 
 def send_notification_changes(element: dict, change: dict):
