@@ -167,6 +167,7 @@ def check_update_catalog():
                                     "season_title": content["title"],
                                 },
                             )
+                            break
                 else:
                     for i, content in enumerate(contents):
                         if content["contents"] != element["contents"][i]["contents"]:
