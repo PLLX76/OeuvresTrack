@@ -260,6 +260,7 @@ def get_info_about_season(id: int, season_number: int):
         ):
             finished = False
             last_air = episode["air_date"]
+            break
 
     recommandate_update = (date.today() + timedelta(days=30)).isoformat()
     if not finished:
