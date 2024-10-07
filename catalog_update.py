@@ -35,6 +35,8 @@ def update_tv_seasons(element, operation):
 
     new_data = {"contents": []}
 
+    have_notification = False
+
     for content in element["contents"]:
         new_season_data = None
         if date.today() >= date.fromisoformat(content["recommandate_update"]):
@@ -53,7 +55,10 @@ def update_tv_seasons(element, operation):
                     {"$set": {"contents.$": new_season_data}},
                 )
             )
-            if content["contents"] != new_season_data["contents"]:
+            if (
+                content["contents"] != new_season_data["contents"]
+                and not have_notification
+            ):
                 for j, episode in enumerate(new_season_data["contents"]):
                     if len(content["contents"]) < j + 1:
                         api.send_notification_changes(
@@ -65,6 +70,9 @@ def update_tv_seasons(element, operation):
                                 "episode_number": j + 1,
                             },
                         )
+
+                        have_notification = True
+                        break
 
         new_data["contents"].append(new_season_data if new_season_data else content)
 

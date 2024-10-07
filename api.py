@@ -1607,6 +1607,8 @@ def send_notification(user_id, title, body, url=None, icon=None):
 
     subscriptions_info = get_subscription_from_db(user_id)
 
+    operation = []
+
     if subscriptions_info is None:
         print(
             f"Echec d'envoi de notification : {user_id} subscription_data n'est pas définie"
@@ -1625,7 +1627,17 @@ def send_notification(user_id, title, body, url=None, icon=None):
             )
             print(f"Notification envoyée à {user_id}, body : {body}")
         except WebPushException as ex:
+            if ex.response.status_code == 410:
+                operation.append(
+                    UpdateOne(
+                        {"id": user_id},
+                        {"$pull": {"subscriptions_data": subscription_info}},
+                    )
+                )
             print(f"Echec d'envoi de notification : {ex}, body : {body}")
+
+    if len(operation) > 0:
+        db.users.bulk_write(operation)
 
 
 def send_notification_changes(element: dict, change: dict):
