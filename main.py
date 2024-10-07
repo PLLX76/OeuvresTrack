@@ -61,6 +61,9 @@ VAPID_PRIVATE_KEY = os.getenv("VAPID_PRIVATE_KEY")
 debug = False
 testing = False
 
+if os.getenv("ENV") == "production":
+    debug = False
+
 
 def get_cache_key(request):
     return request.url
@@ -297,7 +300,7 @@ def subscribe():
 
 @app.route("/api/new/<type>/<query>", methods=["GET"])
 @login_required
-@conditional_decorator(cache.cached(timeout=60 * 60), not debug)
+@conditional_decorator(cache.cached(timeout=60 * 20), not debug)
 def api_new_query(type: str, query: str):
     if query is not None and len(query) < 1:
         abort(400)
@@ -320,7 +323,7 @@ def api_get(type: str, id: str):
 
     new_element = get_new_element(type, id)
     if new_element:
-        return jsonify(new_element)
+        return new_element
     abort(404)
 
 

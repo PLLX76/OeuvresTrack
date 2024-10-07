@@ -537,6 +537,11 @@ const modalEditElements = document.getElementById("elements");
 async function openModalEdit(data_id, data_type) {
   const id = data_id;
   const type = data_type;
+
+  const loader_html =
+    '<div id="loader"><span class="loader__element"></span><span class="loader__element"></span><span class="loader__element"></span></div>';
+  document.body.insertAdjacentHTML("beforeend", loader_html);
+
   let contentData = await getContentData(type, id);
   let contentUserData = await getUserContentData(type, id);
   modalEditTitle.innerText = contentData.title;
@@ -798,9 +803,11 @@ async function openModalEdit(data_id, data_type) {
   window.history.pushState(
     { modal: "edit", id: data_id, type: data_type },
     "",
-    "/app/" + data_type + "/" + data_id.toString()
+    "/app/" + data_type + "/" + data_id.toString() + "/"
   );
   modalEditAddListener(type);
+
+  document.getElementById("loader").remove();
 }
 function closeAllModals(modify_history = false) {
   closeModalEditFunc(false);

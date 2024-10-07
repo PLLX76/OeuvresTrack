@@ -32,7 +32,11 @@ def process_update(element, new_data, extra_fields=None):
 def update_tv_seasons(element, operation):
     """Gère la mise à jour des saisons pour les séries TV."""
     finished = True
+
+    new_data = {"contents": []}
+
     for content in element["contents"]:
+        new_season_data = None
         if date.today() >= date.fromisoformat(content["recommandate_update"]):
             new_season_data = api.get_info_about_season(
                 element["original_id"], content["season_number"]
@@ -49,7 +53,7 @@ def update_tv_seasons(element, operation):
                     {"$set": {"contents.$": new_season_data}},
                 )
             )
-            if content != new_season_data:
+            if content["contents"] != new_season_data["contents"]:
                 for j, episode in enumerate(new_season_data["contents"]):
                     if len(content["contents"]) < j + 1:
                         api.send_notification_changes(
@@ -61,6 +65,9 @@ def update_tv_seasons(element, operation):
                                 "episode_number": j + 1,
                             },
                         )
+
+        new_data["contents"].append(new_season_data if new_season_data else content)
+
         if not content.get("finished", True):
             finished = False
 
@@ -71,6 +78,8 @@ def update_tv_seasons(element, operation):
                 {"$set": {"finished": finished}},
             )
         )
+
+    return new_data
 
 
 def check_update_catalog():
@@ -92,13 +101,24 @@ def check_update_catalog():
     operation = []
 
     for element in data:
+        have_change = False
+
         if today >= date.fromisoformat(element["recommandate_update"]):
             if element["type"] == "book":
                 new_data = api.get_book_by_id(element["original_id"])
+
+                # ignore if book or movie
+                # if element["overview"] != new_data["overview"] or element["title"] != new_data["title"]:
+                #     have_change = True
+
                 operation.append(process_update(element, new_data))
 
             elif element["type"] == "movie":
                 new_data = api.get_movie_by_id(element["original_id"])
+
+                # if element["overview"] != new_data["overview"] or element["title"] != new_data["title"]:
+                #     have_change = True
+
                 operation.append(process_update(element, new_data))
 
             elif element["type"] == "books":
@@ -126,6 +146,11 @@ def check_update_catalog():
                                     ),
                                 },
                             )
+
+                            have_change = True
+
+                if have_change:
+                    element["contents"] = new_data["contents"]
 
             elif element["type"] == "tv":
                 new_data = api.get_tv_by_id(element["original_id"])
@@ -167,6 +192,8 @@ def check_update_catalog():
                                     "season_title": content["title"],
                                 },
                             )
+
+                            have_change = True
                             break
                 else:
                     for i, content in enumerate(contents):
@@ -182,10 +209,25 @@ def check_update_catalog():
                                             "episode_number": j + 1,
                                         },
                                     )
+                                    have_change = True
+                                    break
+
+                if have_change:
+                    element["contents"] = contents
 
         else:
             if element["type"] == "tv":
-                update_tv_seasons(element, operation)
+                new_data = update_tv_seasons(element, operation)
+
+                if new_data["contents"] != element["contents"]:
+                    have_change = True
+                    element["contents"] = new_data["contents"]
+
+        if have_change is True:
+            for ucatalog in api.db.ucatalog.find(
+                {"id": element["original_id"], "type": element["type"]}
+            ):
+                api.send_update_ucatalog(element, ucatalog)
 
     if operation:
         api.db.catalog.bulk_write(operation)

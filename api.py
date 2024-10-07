@@ -1090,7 +1090,6 @@ def get_ucatalog(user_id: int, type: str, id: str):
     del data["id"]
     del data["_id"]
     del data["type"]
-    del data["user_id"]
     data["exist"] = True
     return data
 
@@ -1223,6 +1222,43 @@ def get_status(
     return status
 
 
+def send_update_ucatalog(catalog, ucatalog):
+    settings = get_settings(user_id=ucatalog["user_id"])
+    lexicon = default_lexicon.copy() if settings is None else settings["lexicon"]
+
+    ucatalog["status"] = get_status(
+        catalog=catalog, ucatalog=ucatalog, settings=settings
+    )
+
+    # Update ucatalog and ulist
+    db.ucatalog.update_one(
+        {
+            "user_id": ucatalog["user_id"],
+            "id": catalog["original_id"],
+            "type": catalog["type"],
+        },
+        {"$set": {"watch": ucatalog["watch"], "status": ucatalog["status"]}},
+    )
+    db.ulist.update_one(
+        {
+            "id": ucatalog["user_id"],
+            "list": {
+                "$elemMatch": {"id": catalog["original_id"], "type": catalog["type"]}
+            },
+        },
+        {
+            "$set": {
+                "list.$.text": get_ulist_text(catalog, ucatalog, lexicon),
+                "list.$.status": ucatalog["status"],
+                "list.$.checked": ucatalog["status"] == "done"
+                or ucatalog["status"] == "giveup",
+            }
+        },
+    )
+
+    return ucatalog["status"]
+
+
 def update_ucatalog(
     user_id: int, type: str, id, season_number: int, changes: list | bool
 ):
@@ -1291,31 +1327,17 @@ def update_ucatalog(
 
     catalog = db.get_collection("catalog").find_one(
         {"original_id": id, "type": type},
-        {"title": 1, "type": 1, "contents": 1, "finished": 1},
-    )
-    settings = get_settings(user_id=user_id)
-    lexicon = default_lexicon.copy() if settings is None else settings["lexicon"]
-
-    ucatalog["status"] = get_status(
-        catalog=catalog, ucatalog=ucatalog, settings=settings
-    )
-
-    # Update ucatalog and ulist
-    db.ucatalog.update_one(
-        {"user_id": user_id, "id": id, "type": type},
-        {"$set": {"watch": ucatalog["watch"], "status": ucatalog["status"]}},
-    )
-    db.ulist.update_one(
-        {"id": user_id, "list": {"$elemMatch": {"id": id, "type": type}}},
         {
-            "$set": {
-                "list.$.text": get_ulist_text(catalog, ucatalog, lexicon),
-                "list.$.status": ucatalog["status"],
-                "list.$.checked": ucatalog["status"] == "done"
-                or ucatalog["status"] == "giveup",
-            }
+            "title": 1,
+            "type": 1,
+            "contents": 1,
+            "finished": 1,
+            "original_id": 1,
+            "type": 1,
         },
     )
+
+    ucatalog["status"] = send_update_ucatalog(catalog, ucatalog)
 
     return ucatalog
 
@@ -1601,13 +1623,16 @@ def send_notification(user_id, title, body, url=None, icon=None):
                 vapid_private_key=VAPID_PRIVATE_KEY,
                 vapid_claims={"sub": "mailto:paul.a.leroy02@gmail.com"},
             )
-            print(f"Notification envoyée à {user_id}")
+            print(f"Notification envoyée à {user_id}, body : {body}")
         except WebPushException as ex:
-            print(f"Echec d'envoi de notification : {ex}")
+            print(f"Echec d'envoi de notification : {ex}, body : {body}")
 
 
 def send_notification_changes(element: dict, change: dict):
-    data = db.ucatalog.find({"type": element["type"], "id": element["original_id"]}, {"user_id": 1, "status": 1})
+    data = db.ucatalog.find(
+        {"type": element["type"], "id": element["original_id"]},
+        {"user_id": 1, "status": 1},
+    )
 
     if data is None:
         return {"status": "error"}
@@ -1615,15 +1640,20 @@ def send_notification_changes(element: dict, change: dict):
         if user["status"] != "giveup":
             if element["type"] == "tv":
                 if change["change"] == "new_season":
-                    title = f"{element["title"]} : Nouvelle saison"
+                    title = f"{element['title']} : Nouvelle saison"
                     body = f"{change['season_title']} de la série {element['title']} est sortie !"
                 else:
                     title = f"{element['title']} : Nouvelle episode"
-                    body = f"L'épisode {change['episode_number']} de{"s" if change["season_number"] == 0 else ''} {change['season_title']} de la serie {element['title']} est sortie !"
+                    body = f"L'épisode {change['episode_number']} de{'s' if change['season_number'] == 0 else ''} {change['season_title']} de la serie {element['title']} est sortie !"
             elif element["type"] == "books":
                 if change["change"] == "new_book":
                     title = f"{element['title']} : Nouveau livre {change['book_index']}"
                     body = f"Le livre '{change['book_title']}' de {element['title']} ({change['books_count']}) est disponible !"
             else:
                 return {"status": "error"}
-            send_notification(user["user_id"], title, body, url=f"/{element["type"]}/{element['original_id']}/")
+            send_notification(
+                user["user_id"],
+                title,
+                body,
+                url=f"/{element['type']}/{element['original_id']}/",
+            )
