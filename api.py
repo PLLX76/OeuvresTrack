@@ -957,6 +957,9 @@ def hard_reload(user_id: int):
         default_lexicon.copy() if settings["lexicon"] == {} else settings["lexicon"]
     )
 
+    if len(ulist["list"]) == 0:
+        return ulist["list"]
+
     pipeline = [
         {
             "$match": {
