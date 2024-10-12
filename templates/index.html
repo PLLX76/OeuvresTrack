@@ -27,11 +27,6 @@
   </head>
   <body class="preload">
     <main>
-      {% if 'action' in request.args %}
-      <div id="modal-back" style="display: block"></div>
-      {% else %}
-      <div id="modal-back"></div>
-      {% endif %}
       <nav>
         <div>
           <img
@@ -95,7 +90,7 @@
       <section id="videos"></section>
 
       {% if 'action' in request.args %}
-      <div id="modal-login" style="transform: scale(1);">
+      <div id="modal-login" class="open">
       {% else %}
       <div id="modal-login">
       {% endif %}
@@ -198,6 +193,7 @@
           </form>
         </div>
       </div>
+      <div id="modal-back"></div>
     </main>
   </body>
 </html>

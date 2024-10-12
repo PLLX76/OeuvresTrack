@@ -933,10 +933,14 @@ function getList(hard = false) {
 
   return fetch(url)
     .then((response) => {
-      if (!response.ok) {
-        throw new Error(`Erreur HTTP ! statut : ${response.status}`);
+      if (response.status === 401) {
+        window.location.href = "/?action=login";
+      } else {
+        if (!response.ok) {
+          throw new Error(`Erreur HTTP ! statut : ${response.status}`);
+        }
+        return response.json();
       }
-      return response.json();
     })
     .then((data) => {
       return data;

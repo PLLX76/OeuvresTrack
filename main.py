@@ -58,7 +58,7 @@ if os.getenv("ENV") != "production":
 VAPID_PUBLIC_KEY = os.getenv("VAPID_PUBLIC_KEY")
 VAPID_PRIVATE_KEY = os.getenv("VAPID_PRIVATE_KEY")
 
-debug = False
+debug = True
 testing = False
 
 if os.getenv("ENV") == "production":
@@ -379,10 +379,11 @@ def api_user_password():
 
 
 @app.route("/api/user/list", methods=["GET"])
-@login_required
 @no_cache
 @limiter.limit("10 per minute; 150 per hour; 300 per day")
 def get_user_list():
+    if "user" not in session:
+        return jsonify({"status": "error"}), 401
     return get_user_ulist(session["user"]["id"])
 
 

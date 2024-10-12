@@ -76,6 +76,9 @@ nav > div {
 }
 #modal-back {
   position: fixed;
+  top: 0;
+  left: 0;
+
   z-index: 3;
   background-color: black;
   opacity: 0.2;
@@ -89,7 +92,7 @@ nav > div {
   will-change: transform;
   -webkit-transform: scale(0);
   -ms-transform: scale(0);
-  transform: scale(0);
+  transform: scale(0) translate(0%, -50%);
   -webkit-transition: -webkit-transform 0.25s;
   transition: -webkit-transform 0.25s;
   -o-transition: transform 0.25s;
@@ -98,9 +101,8 @@ nav > div {
 
   position: fixed;
   z-index: 4;
-  top: 25%;
+  top: 50%;
   left: 0;
-  /* transform: translate(-50%, -50%); */
 
   width: calc(100% - 30px);
   max-width: 600px;
@@ -109,6 +111,15 @@ nav > div {
   max-height: 500px;
   background-color: whitesmoke;
   border-radius: 10px;
+}
+#modal-login.open {
+  transform: scale(1) translate(0%, -50%);
+}
+.open ~ #modal-back {
+  display: block;
+}
+body:has(#modal-login.open) {
+  overflow: hidden;
 }
 #modal-login > div:first-child {
   display: -webkit-box;

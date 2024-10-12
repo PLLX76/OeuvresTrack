@@ -4,14 +4,15 @@ const modalBack = document.getElementById("modal-back");
 const modalLogin = document.getElementById("modal-login");
 
 loginBtn.addEventListener("click", () => {
-  modalLogin.style.transform = "scale(1)";
-  modalBack.style.display = "block";
+  modalLogin.classList.add("open");
 });
 
-closeModalLogin.addEventListener("click", () => {
-  modalLogin.style.transform = "scale(0)";
-  modalBack.style.display = "none";
-});
+function closeModal() {
+  modalLogin.classList.remove("open");
+}
+
+closeModalLogin.addEventListener("click", closeModal);
+modalBack.addEventListener("click", closeModal);
 
 const changeMode = document.getElementById("change-mode");
 const modalLoginTitle = document.getElementById("modal-login-title");
