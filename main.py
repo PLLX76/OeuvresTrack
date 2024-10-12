@@ -58,7 +58,7 @@ if os.getenv("ENV") != "production":
 VAPID_PUBLIC_KEY = os.getenv("VAPID_PUBLIC_KEY")
 VAPID_PRIVATE_KEY = os.getenv("VAPID_PRIVATE_KEY")
 
-debug = True
+debug = False
 testing = False
 
 if os.getenv("ENV") == "production":
