@@ -9,6 +9,8 @@ if (workbox) {
   console.error(`Échec du chargement de Workbox`);
 }
 
+workbox.precaching.precacheAndRoute([{ url: "/sw.js", revision: "1.0.0" }]);
+
 // Mettre en cache toutes les ressources statiques : CSS, JS, images
 workbox.routing.registerRoute(
   ({ request }) =>
