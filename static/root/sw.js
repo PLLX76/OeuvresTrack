@@ -5,69 +5,107 @@ importScripts(
 // Vérification que Workbox est bien chargé
 if (workbox) {
   console.log(`Workbox est chargé`);
+
+  workbox.precaching.precacheAndRoute([{ url: "/sw.js", revision: null }]);
+
+  // Mettre en cache toutes les ressources statiques : CSS, JS, images
+  workbox.routing.registerRoute(
+    ({ request }) =>
+      request.destination === "style" ||
+      request.destination === "script" ||
+      request.destination === "image",
+    new workbox.strategies.CacheFirst({
+      cacheName: "static-resources",
+      plugins: [
+        new workbox.expiration.ExpirationPlugin({
+          maxEntries: 100,
+          maxAgeSeconds: 30 * 24 * 60 * 60, // 30 jours
+        }),
+      ],
+    })
+  );
+
+  // Mettre en cache les requêtes pour la page principale de l'application
+  workbox.routing.registerRoute(
+    ({ request }) => request.destination === "document",
+    new workbox.strategies.CacheFirst({
+      cacheName: "pages-cache",
+      plugins: [
+        new workbox.expiration.ExpirationPlugin({
+          maxEntries: 10,
+          maxAgeSeconds: 7 * 24 * 60 * 60, // 7 jours
+        }),
+      ],
+    })
+  );
+
+  // Mettre en cache les icones
+  workbox.routing.registerRoute(
+    ({ url }) => url.pathname.startsWith("/static/icons/"),
+    new workbox.strategies.CacheFirst({
+      cacheName: "icons-cache",
+      plugins: [
+        new workbox.expiration.ExpirationPlugin({
+          maxEntries: 30,
+          maxAgeSeconds: 60 * 24 * 60 * 60, // 60 Jours
+        }),
+      ],
+    })
+  );
+
+  // Mettre en cache les requêtes dynamiques pour le mode offline
+  workbox.routing.registerRoute(
+    ({ url }) => true, // Attraper toutes les autres requêtes
+    new workbox.strategies.NetworkFirst({
+      cacheName: "dynamic-cache",
+      plugins: [
+        new workbox.expiration.ExpirationPlugin({
+          maxEntries: 100,
+        }),
+      ],
+    })
+  );
 } else {
   console.error(`Échec du chargement de Workbox`);
 }
 
-workbox.precaching.precacheAndRoute([{ url: "/sw.js", revision: null }]);
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches
+      .open("v1")
+      .then((cache) =>
+        cache.addAll([
+          "/",
+          "/app",
+          "/static/js/home.js",
+          "/static/css/home.css",
+          "/static/css/home_secondary.css",
+          "/static/icons/logo_mini.svg",
+        ])
+      )
+  );
+});
 
-// Mettre en cache toutes les ressources statiques : CSS, JS, images
-workbox.routing.registerRoute(
-  ({ request }) =>
-    request.destination === "style" ||
-    request.destination === "script" ||
-    request.destination === "image",
-  new workbox.strategies.CacheFirst({
-    cacheName: "static-resources",
-    plugins: [
-      new workbox.expiration.ExpirationPlugin({
-        maxEntries: 100,
-        maxAgeSeconds: 30 * 24 * 60 * 60, // 30 jours
-      }),
-    ],
-  })
-);
+self.addEventListener("fetch", (event) => {
+  event.respondWith(
+    caches.match(event.request).then((response) => {
+      if (response !== undefined) {
+        return response;
+      } else {
+        return fetch(event.request)
+          .then((response) => {
+            let responseClone = response.clone();
 
-// Mettre en cache les requêtes pour la page principale de l'application
-workbox.routing.registerRoute(
-  ({ request }) => request.destination === "document",
-  new workbox.strategies.CacheFirst({
-    cacheName: "pages-cache",
-    plugins: [
-      new workbox.expiration.ExpirationPlugin({
-        maxEntries: 10,
-        maxAgeSeconds: 7 * 24 * 60 * 60, // 7 jours
-      }),
-    ],
-  })
-);
-
-// Mettre en cache les icones
-workbox.routing.registerRoute(
-  ({ url }) => url.pathname.startsWith("/static/icons/"),
-  new workbox.strategies.CacheFirst({
-    cacheName: "icons-cache",
-    plugins: [
-      new workbox.expiration.ExpirationPlugin({
-        maxEntries: 30,
-        maxAgeSeconds: 60 * 24 * 60 * 60, // 60 Jours
-      }),
-    ],
-  })
-);
-
-// Mettre en cache les requêtes dynamiques pour le mode offline
-workbox.routing.registerRoute(
-  ({ url }) => true, // Attraper toutes les autres requêtes
-  new workbox.strategies.NetworkFirst({
-    cacheName: "dynamic-cache",
-    plugins: [
-      new workbox.expiration.ExpirationPlugin({
-        maxEntries: 100,
-      }),
-    ],
-  })
-);
+            caches.open("v1").then((cache) => {
+              cache.put(event.request, responseClone);
+            });
+            return response;
+          })
+          .catch(() => caches.match("/img/img1.jpg"));
+      }
+    })
+  );
+});
 
 self.addEventListener("push", function (event) {
   const data = event.data.json();

@@ -43,40 +43,6 @@ function checkPasswords() {
   }
   return true;
 }
-if ("serviceWorker" in navigator && "PushManager" in window) {
-  navigator.serviceWorker
-    .register("/sw.js")
-    .then(function (registration) {
-      console.log("Service Worker registered with scope:", registration.scope);
-
-      Notification.requestPermission().then(function (permission) {
-        if (permission === "granted") {
-          console.log("Permission de notification accordée.");
-
-          registration.pushManager
-            .subscribe({
-              userVisibleOnly: true,
-              applicationServerKey:
-                "BFs-mhV_ILjmQ-f0OvhSsbUozBKQZCV9gEACp2m9hrSYi-gfkK7m-fx6hz55G2qeRNYJxAw_EQ6nAmvYCijhi7k",
-            })
-            .then(function (subscription) {
-              fetch("/subscribe", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify(subscription),
-              });
-            });
-        } else {
-          console.log("Permission de notification refusée.");
-        }
-      });
-    })
-    .catch(function (error) {
-      console.log("Service Worker registration failed:", error);
-    });
-}
 window.addEventListener("load", () => {
   document.body.classList.remove("preload");
 });
