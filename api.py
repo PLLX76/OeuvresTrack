@@ -790,10 +790,14 @@ def get_ulist_text(catalog, ucatalog=None, lexicon={}) -> str:
         for i in lexicon["OnTome"]:
             if "disabled" not in i:
                 if ucatalog is not None:
+                    tome = 0
+                    if len(ucatalog["watch"][0]["watched"]) > 0:
+                        tome = int(ucatalog["watch"][0]["watched"][-1].split("-")[-1])
+
                     elements.append(
                         {
                             "text": i["text"].format(
-                                int(ucatalog["watch"][0]["watched"][-1].split("-")[-1]),
+                                tome,
                                 len(catalog["contents"][0]["contents"]),
                             ),
                             "position": i["position"],

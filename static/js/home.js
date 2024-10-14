@@ -364,7 +364,6 @@ async function updateSelectedEpisodes(nb_selected, season) {
     }
   }
 
-  // On attend que sendSelectedData soit terminée
   sendUpdatePromise.push(
     await sendSelectedData(
       modalEdit.dataset.id,

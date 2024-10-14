@@ -55,9 +55,123 @@
   "shortcuts": [
     {
       "name": "Ajouter un element",
-      "url": "/add",
-      "description": "Renvoie sur la page pour ajouter un élément"
+      "short_name": "Ajouter",
+      "url": "/app/add",
+      "description": "Renvoie sur la page pour ajouter un élément",
+      "icons": [
+        {
+          "src": "/static/icons/add.svg",
+          "type": "image/svg+xml",
+          "sizes": "24x24"
+        }
+      ]
+    },
+    {
+      "name": "Votre Tierlist",
+      "short_name": "Tierlist",
+      "url": "/app/tierlist",
+      "description": "Renvoie sur votre tierlist",
+      "icons": [
+        {
+          "src": "/static/icons/view_list.svg",
+          "type": "image/svg+xml",
+          "sizes": "24x24"
+        }
+      ]
     }
   ],
-  "categories": ["books", "entertainment", "productivity"]
+  "categories": ["books", "entertainment", "productivity"],
+  "screenshots": [
+    {
+      "src": "/static/screenshots/screenshot_pixel_7_1.png",
+      "sizes": "1080x2400",
+      "type": "image/png",
+      "platform": "narrow",
+      "label": "Google Pixel 7 Screenshot 1"
+    },
+    {
+      "src": "/static/screenshots/screenshot_pixel_7_2.png",
+      "sizes": "1080x2400",
+      "type": "image/png",
+      "platform": "narrow",
+      "label": "Google Pixel 7 Screenshot 2"
+    },
+    {
+      "src": "/static/screenshots/screenshot_pixel_7_3.png",
+      "sizes": "1080x2400",
+      "type": "image/png",
+      "platform": "narrow",
+      "label": "Google Pixel 7 Screenshot 3"
+    },
+    {
+      "src": "/static/screenshots/screenshot_iphone_14_pro_max_1.png",
+      "sizes": "1290x2796",
+      "type": "image/png",
+      "platform": "narrow",
+      "label": "iPhone 14 Pro Max Screenshot 1"
+    },
+    {
+      "src": "/static/screenshots/screenshot_iphone_14_pro_max_2.png",
+      "sizes": "1290x2796",
+      "type": "image/png",
+      "platform": "narrow",
+      "label": "iPhone 14 Pro Max Screenshot 2"
+    },
+    {
+      "src": "/static/screenshots/screenshot_iphone_14_pro_max_3.png",
+      "sizes": "1290x2796",
+      "type": "image/png",
+      "platform": "narrow",
+      "label": "iPhone 14 Pro Max Screenshot 3"
+    },
+    {
+      "src": "/static/screenshots/screenshot_ipad_pro_1.png",
+      "sizes": "2048x2732",
+      "type": "image/png",
+      "platform": "wide",
+      "label": "iPad Pro Screenshot 1"
+    },
+    {
+      "src": "/static/screenshots/screenshot_ipad_pro_2.png",
+      "sizes": "2048x2732",
+      "type": "image/png",
+      "platform": "wide",
+      "label": "iPad Pro Screenshot 2"
+    },
+    {
+      "src": "/static/screenshots/screenshot_ipad_pro_3.png",
+      "sizes": "2048x2732",
+      "type": "image/png",
+      "platform": "wide",
+      "label": "iPad Pro Screenshot 3"
+    },
+    {
+      "src": "/static/screenshots/screenshot_desktop_hd_1.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "platform": "wide",
+      "label": "Desktop HD Screenshot 1"
+    },
+    {
+      "src": "/static/screenshots/screenshot_desktop_hd_2.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "platform": "wide",
+      "label": "Desktop HD Screenshot 2"
+    },
+    {
+      "src": "/static/screenshots/screenshot_desktop_hd_3.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "platform": "wide",
+      "label": "Desktop HD Screenshot 3"
+    },
+    {
+      "src": "/static/screenshots/screenshot_desktop_hd_4.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "platform": "wide",
+      "label": "Desktop HD Screenshot 4"
+    }
+  ]
 }

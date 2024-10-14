@@ -69,10 +69,10 @@ def get_cache_key(request):
     return request.url
 
 
-def get_user_id_key():
+def get_user_id_key(*args, **kwargs):
     if "user" in session:
-        return f"{request.endpoint}-{session['user']['id']}"
-    return request.endpoint
+        return f"{request.url}-{session['user']['id']}"
+    return request.url
 
 
 app = Flask(__name__)

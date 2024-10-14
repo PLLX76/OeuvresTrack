@@ -6,7 +6,12 @@ importScripts(
 if (workbox) {
   console.log(`Workbox est chargé`);
 
-  workbox.precaching.precacheAndRoute([{ url: "/sw.js", revision: null }]);
+  workbox.precaching.precacheAndRoute([
+    {
+      url: "/app",
+      revision: null,
+    },
+  ]);
 
   // Mettre en cache toutes les ressources statiques : CSS, JS, images
   workbox.routing.registerRoute(
@@ -68,44 +73,6 @@ if (workbox) {
 } else {
   console.error(`Échec du chargement de Workbox`);
 }
-
-self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches
-      .open("v1")
-      .then((cache) =>
-        cache.addAll([
-          "/",
-          "/app",
-          "/static/js/home.js",
-          "/static/css/home.css",
-          "/static/css/home_secondary.css",
-          "/static/icons/logo_mini.svg",
-        ])
-      )
-  );
-});
-
-self.addEventListener("fetch", (event) => {
-  event.respondWith(
-    caches.match(event.request).then((response) => {
-      if (response !== undefined) {
-        return response;
-      } else {
-        return fetch(event.request)
-          .then((response) => {
-            let responseClone = response.clone();
-
-            caches.open("v1").then((cache) => {
-              cache.put(event.request, responseClone);
-            });
-            return response;
-          })
-          .catch(() => caches.match("/img/img1.jpg"));
-      }
-    })
-  );
-});
 
 self.addEventListener("push", function (event) {
   const data = event.data.json();
