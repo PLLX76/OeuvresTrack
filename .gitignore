@@ -5,3 +5,5 @@ __pycache__
 env.bat
 reset_db.py
 .env
+.gitignore
+devserver.sh
