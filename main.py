@@ -64,13 +64,16 @@ testing = False
 if os.getenv("ENV") == "production":
     debug = False
 
+
 def get_cache_key(request):
-    return request.endpoint
+    return request.url
+
 
 def get_user_id_key():
     if "user" in session:
         return f"{request.endpoint}-{session['user']['id']}"
     return request.endpoint
+
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
@@ -201,7 +204,9 @@ def no_cache(f):
 
 @app.route("/app/", methods=["GET", "POST"])
 @login_required
-@conditional_decorator(cache.cached(timeout=60 * 60, make_cache_key=get_user_id_key), not debug)
+@conditional_decorator(
+    cache.cached(timeout=60 * 60, make_cache_key=get_user_id_key), not debug
+)
 def app_home():
     return render_template(
         "home.html",
@@ -216,7 +221,9 @@ def app_home():
 
 @app.route("/app/settings", methods=["GET", "POST"])
 @login_required
-@conditional_decorator(cache.cached(timeout=60 * 60, make_cache_key=get_user_id_key), not debug)
+@conditional_decorator(
+    cache.cached(timeout=60 * 60, make_cache_key=get_user_id_key), not debug
+)
 def app_settings():
     return render_template(
         "home.html",
@@ -231,7 +238,9 @@ def app_settings():
 
 @app.route("/app/tierlist", methods=["GET", "POST"])
 @login_required
-@conditional_decorator(cache.cached(timeout=60 * 60, make_cache_key=get_user_id_key), not debug)
+@conditional_decorator(
+    cache.cached(timeout=60 * 60, make_cache_key=get_user_id_key), not debug
+)
 def app_tierlist():
     return render_template(
         "home.html",
@@ -246,7 +255,9 @@ def app_tierlist():
 
 @app.route("/app/<type>/<id>/", methods=["GET", "POST"])
 @login_required
-@conditional_decorator(cache.cached(timeout=60 * 60, make_cache_key=get_user_id_key), not debug)
+@conditional_decorator(
+    cache.cached(timeout=60 * 60, make_cache_key=get_user_id_key), not debug
+)
 def app_edit(id, type):
     return render_template(
         "home.html",
@@ -261,7 +272,9 @@ def app_edit(id, type):
 
 @app.route("/app/add", methods=["GET", "POST"])
 @login_required
-@conditional_decorator(cache.cached(timeout=60 * 60, make_cache_key=get_user_id_key), not debug)
+@conditional_decorator(
+    cache.cached(timeout=60 * 60, make_cache_key=get_user_id_key), not debug
+)
 def app_add():
     return render_template(
         "home.html",
