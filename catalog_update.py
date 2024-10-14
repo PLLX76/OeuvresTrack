@@ -40,9 +40,15 @@ def update_tv_seasons(element, operation):
     for content in element["contents"]:
         new_season_data = None
         if date.today() >= date.fromisoformat(content["recommandate_update"]):
-            new_season_data = api.get_info_about_season(
-                element["original_id"], content["season_number"]
+            print(
+                f"Check Update {element['title']} {content['title']} recommandé le {content['recommandate_update']}"
             )
+            try:
+                new_season_data = api.get_info_about_season(
+                    element["original_id"], content["season_number"]
+                )
+            except:
+                continue
             operation.append(
                 UpdateOne(
                     {
@@ -112,6 +118,9 @@ def check_update_catalog():
         have_change = False
 
         if today >= date.fromisoformat(element["recommandate_update"]):
+            print(
+                f"Check Update {element['type']}, {element['original_id']}, {element['title']} recommandé le {element['recommandate_update']}"
+            )
             if element["type"] == "book":
                 new_data = api.get_book_by_id(element["original_id"])
 
