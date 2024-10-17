@@ -155,7 +155,7 @@ else:
         strategy="fixed-window",
     )
 
-if not debug and not testing:
+if not debug and not testing and False:
     compress.cache = cache
     compress.cache_key = get_cache_key
 
