@@ -43,6 +43,14 @@ if (workbox) {
       url: "/static/js/tierlist.js",
       revision: null,
     },
+    {
+      url: "/sw.js",
+      revision: null,
+    },
+    {
+      url: "/manifest.json",
+      revision: null,
+    },
   ]);
 
   // Mettre en cache toutes les ressources statiques : CSS, JS, images
