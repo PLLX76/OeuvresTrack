@@ -8,6 +8,10 @@ if (workbox) {
 
   workbox.precaching.precacheAndRoute([
     {
+      url: "/app/",
+      revision: null,
+    },
+    {
       url: "/app/?utm_source=pwa",
       revision: null,
     },

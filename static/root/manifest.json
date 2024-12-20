@@ -62,7 +62,7 @@
         {
           "src": "/static/icons/add.svg",
           "type": "image/svg+xml",
-          "sizes": "24x24"
+          "sizes": "96x96"
         }
       ]
     },
@@ -75,7 +75,7 @@
         {
           "src": "/static/icons/view_list.svg",
           "type": "image/svg+xml",
-          "sizes": "24x24"
+          "sizes": "96x96"
         }
       ]
     }
