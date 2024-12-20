@@ -43,8 +43,8 @@
       "sizes": "48x48"
     }
   ],
-  "id": "/app?utm_source=pwa",
-  "start_url": "/app?utm_source=pwa",
+  "id": "/app/?utm_source=pwa",
+  "start_url": "/app/?utm_source=pwa",
   "background_color": "#ffffff",
   "display": "standalone",
   "scope": "/",

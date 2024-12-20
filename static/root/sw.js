@@ -8,7 +8,35 @@ if (workbox) {
 
   workbox.precaching.precacheAndRoute([
     {
-      url: "/app",
+      url: "/app/?utm_source=pwa",
+      revision: null,
+    },
+    {
+      url: "/static/css/home.css",
+      revision: null,
+    },
+    {
+      url: "/static/css/home_secondary.css",
+      revision: null,
+    },
+    {
+      url: "/static/css/settings.css",
+      revision: null,
+    },
+    {
+      url: "/static/css/tierlist.css",
+      revision: null,
+    },
+    {
+      url: "/static/js/home.js",
+      revision: null,
+    },
+    {
+      url: "/static/js/settings.js",
+      revision: null,
+    },
+    {
+      url: "/static/js/tierlist.js",
       revision: null,
     },
   ]);
