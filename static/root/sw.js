@@ -51,6 +51,110 @@ if (workbox) {
       url: "/manifest.json",
       revision: null,
     },
+    {
+      url: "/static/icons/account_circle.svg",
+      revision: null,
+    },
+    {
+      url: "/static/icons/add_96dp.svg",
+      revision: null,
+    },
+    {
+      url: "/static/icons/add.svg",
+      revision: null,
+    },
+    {
+      url: "/static/icons/close.svg",
+      revision: null,
+    },
+    {
+      url: "/static/icons/delete.svg",
+      revision: null,
+    },
+    {
+      url: "/static/icons/dictionary.svg",
+      revision: null,
+    },
+    {
+      url: "/static/icons/do_not_disturb_on.svg",
+      revision: null,
+    },
+    {
+      url: "/static/icons/drag_indicator.svg",
+      revision: null,
+    },
+    {
+      url: "/static/icons/edit.svg",
+      revision: null,
+    },
+    {
+      url: "/static/icons/info.svg",
+      revision: null,
+    },
+    {
+      url: "/static/icons/keyboard_arrow_down.svg",
+      revision: null,
+    },
+    {
+      url: "/static/icons/keyboard_arrow_up.svg",
+      revision: null,
+    },
+    {
+      url: "/static/icons/library_books.svg",
+      revision: null,
+    },
+    {
+      url: "/static/icons/logo_complete.svg",
+      revision: null,
+    },
+    {
+      url: "/static/icons/logo_mini.svg",
+      revision: null,
+    },
+    {
+      url: "/static/icons/menu.svg",
+      revision: null,
+    },
+    {
+      url: "/static/icons/more.svg",
+      revision: null,
+    },
+    {
+      url: "/static/icons/movie.svg",
+      revision: null,
+    },
+    {
+      url: "/static/icons/notification_add.svg",
+      revision: null,
+    },
+    {
+      url: "/static/icons/notifications.svg",
+      revision: null,
+    },
+    {
+      url: "/static/icons/save.svg",
+      revision: null,
+    },
+    {
+      url: "/static/icons/search.svg",
+      revision: null,
+    },
+    {
+      url: "/static/icons/settings.svg",
+      revision: null,
+    },
+    {
+      url: "/static/icons/tv.svg",
+      revision: null,
+    },
+    {
+      url: "/static/icons/view_list_96dp.svg",
+      revision: null,
+    },
+    {
+      url: "/static/icons/view_list.svg",
+      revision: null,
+    },
   ]);
 
   // Mettre en cache toutes les ressources statiques : CSS, JS, images

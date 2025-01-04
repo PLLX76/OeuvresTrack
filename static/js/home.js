@@ -693,7 +693,12 @@ async function openModalEdit(data_id, data_type) {
 
       const titleP = document.createElement("p");
       titleP.classList.add("element-title", "tilt-neon");
-      titleP.textContent = content["title"];
+      let contentTitle = content["title"];
+      try {
+        contentTitle +=
+          " - " + content["air_date"].split("-").reverse().join("/");
+      } catch (error) {}
+      titleP.textContent = contentTitle;
 
       const descriptionP = document.createElement("p");
       descriptionP.classList.add("roboto", "element-description");
@@ -795,7 +800,6 @@ async function openModalEdit(data_id, data_type) {
     if (contentUser == true) {
       checked = "checked";
     }
-
     modalEditElements.innerHTML = `<div class="element"><label class="element-header"><h3 class="roboto">${contentData.title}</h3><input type="checkbox" name="element-checkbox" id="element-checkbox" ${checked}></label></div>`;
   }
 
@@ -1223,18 +1227,11 @@ function openModalTierlist() {
         }
         container.insertAdjacentHTML(
           "beforeend",
-          `<button class="draggable" data-type="${catalog["type"]}" data-id="${catalog["id"]}" draggable="true"><img src="${image}" alt="${catalog["title"]} image" title="${catalog["title"]}"/></button>`
+          `<a class="draggable" data-type="${catalog["type"]}" data-id="${catalog["id"]}" draggable="true" href="/app/${catalog["type"]}/${catalog["id"]}/"><img src="${image}" alt="${catalog["title"]} image" title="${catalog["title"]}"/></a>`
         );
       });
     });
     initializeDraggables();
-    const draggables = document.getElementsByClassName("draggable");
-    for (let i = 0; i < draggables.length; i++) {
-      draggables[i].addEventListener("click", () => {
-        modalTierlist.classList.remove("open");
-        openModalEdit(draggables[i]);
-      });
-    }
   });
 
   modalTierlist.classList.add("open");

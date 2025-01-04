@@ -37,7 +37,7 @@
 }
 .row .tierlist-rank {
   min-height: 100%;
-  width: 100px;
+  min-width: 40px;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -54,14 +54,14 @@
   -ms-flex-positive: 1;
   flex-grow: 1;
   background-color: #1a1a17;
-  max-width: calc(100% - 100px);
+  max-width: calc(100% - 50px);
   border-radius: 0px 10px 10px 0px;
 }
 .container {
   display: -ms-grid;
   display: grid;
   padding: 5px;
-  grid-template-columns: repeat(auto-fit, 96px);
+  grid-template-columns: repeat(auto-fit, 56px);
   -ms-flex-line-pack: center;
   align-content: center;
   gap: 3px;
@@ -75,8 +75,8 @@
   border: none;
 }
 .container img {
-  height: 90px;
-  width: 90px;
+  height: 50px;
+  width: 50px;
   -o-object-fit: cover;
   object-fit: cover;
   border-radius: 10px;
@@ -106,10 +106,24 @@
   opacity: 0.5;
 }
 
-@media screen and (max-width: 800px) {
+@media screen and (min-width: 800px) {
+  .row .tierlist-rank {
+    min-width: 80px;
+  }
+}
+
+@media screen and (min-width: 1400px) {
+  .row .tierlist-rank {
+    min-width: 95px;
+  }
   .container {
-    -webkit-box-pack: center;
-    -ms-flex-pack: center;
-    justify-content: center;
+    grid-template-columns: repeat(auto-fit, 76px);
+  }
+  .container img {
+    height: 70px;
+    width: 70px;
+  }
+  .row .container {
+    max-width: calc(100% - 80px);
   }
 }

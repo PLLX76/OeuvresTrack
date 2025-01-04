@@ -281,9 +281,24 @@
     background-color: rgb(50, 50, 50);
   }
   #password-save {
-    background-color: rgba(144, 238, 144, 0.6);
+    background-color: #60895f;
   }
   #settings-logout {
-    background-color: rgba(240, 128, 128, 0.6);
+    background-color: #8c5856;
+  }
+
+  #add-lexicon-line {
+    background-color: transparent;
+  }
+
+  .settings-field input[type="text"],
+  .settings-field input[type="email"],
+  .settings-field input[type="password"] {
+    background-color: rgb(35, 35, 35);
+  }
+  .settings-field input[type="text"]:disabled,
+  .settings-field input[type="email"]:disabled,
+  .settings-field input[type="password"]:disabled {
+    background-color: transparent;
   }
 }
