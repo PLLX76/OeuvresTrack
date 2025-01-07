@@ -21,6 +21,7 @@ class User:
     def start_session(self, user):
         del user["password"]
         del user["date"]
+        del user["subscriptions_data"]
         session["logged_in"] = True
         session["user"] = user
 
