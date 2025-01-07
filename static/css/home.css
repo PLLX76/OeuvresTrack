@@ -395,7 +395,7 @@ button,
 a {
   cursor: pointer;
 }
-#loader {
+.loader {
   background-color: var(--main-color);
   overflow: hidden;
   width: 100%;

@@ -527,14 +527,18 @@ async function openModalEdit(data_id, data_type) {
   const id = data_id;
   const type = data_type;
 
-  // const loader_html =
-  //   '<div id="loader"><span class="loader__element"></span><span class="loader__element"></span><span class="loader__element"></span></div>';
-  // document.body.insertAdjacentHTML("beforeend", loader_html);
+  const loader_html =
+    '<div class="loader"><span class="loader__element"></span><span class="loader__element"></span><span class="loader__element"></span></div>';
+  document.body.insertAdjacentHTML("beforeend", loader_html);
 
   let contentData = await getContentData(type, id);
   let contentUserData = await getUserContentData(type, id);
 
-  // document.getElementById("loader").remove();
+  var loader = document.getElementsByClassName("loader");
+
+  while (loader[0]) {
+    loader[0].parentNode.removeChild(loader[0]);
+  }
 
   modalEditTitle.innerText = contentData.title;
 
