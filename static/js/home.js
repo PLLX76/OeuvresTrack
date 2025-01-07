@@ -1,5 +1,7 @@
 var theme = "light";
 var originalTheme = "system";
+var contentList = [];
+
 function detectColorScheme() {
   if (localStorage.getItem("theme")) {
     if (localStorage.getItem("theme") == "dark") {
@@ -276,17 +278,6 @@ function getUserContentData(type, id) {
     });
 }
 
-var haveListChange = false;
-var sendUpdatePromise = new Array();
-
-function checkReloadList() {
-  if (haveListChange) {
-    reloadList();
-    haveListChange = false;
-  }
-  sendUpdatePromise = new Array();
-}
-
 function closeModalEditFunc(modify_history = true) {
   modalEdit.classList.remove("open");
   modalEdit.classList.remove("native");
@@ -294,8 +285,6 @@ function closeModalEditFunc(modify_history = true) {
   if (modify_history) {
     window.history.pushState({ modal: "" }, "", "/app/");
   }
-
-  Promise.all(sendUpdatePromise).then(checkReloadList);
 }
 
 const closeModalEdit = document.getElementById("close-modal-edit");
@@ -364,14 +353,14 @@ async function updateSelectedEpisodes(nb_selected, season) {
     }
   }
 
-  sendUpdatePromise.push(
-    await sendSelectedData(
-      modalEdit.dataset.id,
-      modalEdit.dataset.type,
-      selectedSeason.dataset.season_number,
-      season
-    )
-  );
+  await sendSelectedData(
+    modalEdit.dataset.id,
+    modalEdit.dataset.type,
+    selectedSeason.dataset.season_number,
+    season
+  ).then((response) => {
+    updateContent(response.data);
+  });
 }
 
 async function sendSelectedData(id, type, season_number = null, season = null) {
@@ -430,7 +419,6 @@ async function sendSelectedData(id, type, season_number = null, season = null) {
             deleteLibraryBtn.style.display = "flex";
             giveUpBtn.style.display = "flex";
           }
-          haveListChange = true;
           resolve(data);
         })
         .catch((error) => {
@@ -510,21 +498,23 @@ function modalEditAddListener(type) {
         seasonSlider.value = nb_selected;
         seasonNumber.value = nb_selected;
 
-        sendUpdatePromise.push(
-          sendSelectedData(
-            modalEdit.dataset.id,
-            modalEdit.dataset.type,
-            season.querySelector(".subelements").dataset.season_number,
-            Array.prototype.indexOf.call(season.parentNode.children, season)
-          )
-        );
+        sendSelectedData(
+          modalEdit.dataset.id,
+          modalEdit.dataset.type,
+          season.querySelector(".subelements").dataset.season_number,
+          Array.prototype.indexOf.call(season.parentNode.children, season)
+        ).then((response) => {
+          updateContent(response.data);
+        });
       });
     }
   } else {
     const element = document.querySelector("#modal-edit .element");
     element.addEventListener("change", () => {
-      sendUpdatePromise.push(
-        sendSelectedData(modalEdit.dataset.id, modalEdit.dataset.type)
+      sendSelectedData(modalEdit.dataset.id, modalEdit.dataset.type).then(
+        (response) => {
+          updateContent(response.data);
+        }
       );
     });
   }
@@ -537,12 +527,15 @@ async function openModalEdit(data_id, data_type) {
   const id = data_id;
   const type = data_type;
 
-  const loader_html =
-    '<div id="loader"><span class="loader__element"></span><span class="loader__element"></span><span class="loader__element"></span></div>';
-  document.body.insertAdjacentHTML("beforeend", loader_html);
+  // const loader_html =
+  //   '<div id="loader"><span class="loader__element"></span><span class="loader__element"></span><span class="loader__element"></span></div>';
+  // document.body.insertAdjacentHTML("beforeend", loader_html);
 
   let contentData = await getContentData(type, id);
   let contentUserData = await getUserContentData(type, id);
+
+  // document.getElementById("loader").remove();
+
   modalEditTitle.innerText = contentData.title;
 
   modalEditPicture.innerHTML = "";
@@ -809,8 +802,6 @@ async function openModalEdit(data_id, data_type) {
     "/app/" + data_type + "/" + data_id.toString() + "/"
   );
   modalEditAddListener(type);
-
-  document.getElementById("loader").remove();
 }
 function closeAllModals(modify_history = false) {
   closeModalEditFunc(false);
@@ -952,37 +943,84 @@ function getList(hard = false) {
       console.error("Erreur lors de la récupération des données :", error);
     });
 }
+function htmlToNode(html) {
+  const template = document.createElement("template");
+  template.innerHTML = html;
+  const nNodes = template.content.childNodes.length;
+  if (nNodes !== 1) {
+    throw new Error(
+      `html parameter must represent a single node; got ${nNodes}. ` +
+        "Note that leading or trailing spaces around an element in your " +
+        'HTML, like " <img/> ", get parsed as text nodes neighbouring ' +
+        "the element; call .trim() on your input to avoid this."
+    );
+  }
+  return template.content.firstChild;
+}
+function contentInnerHTML(content) {
+  let checked = "";
+  if (content.checked) {
+    checked = "checked";
+  }
+
+  const innerHTML = `<input type="checkbox" id="checkbox_${content.id
+    .toString()
+    .replaceAll(" ", "_")}" name="checkbox_${content.id
+    .toString()
+    .replaceAll(" ", "_")}" disabled ${checked}/><span>${content.text}</span>`;
+
+  return innerHTML;
+}
+function contentToHTML(content) {
+  let image = "";
+  if (content.type == "tv" || content.type == "movie") {
+    image = "https://image.tmdb.org/t/p/w200" + content.catalog.image.backdrop;
+  } else {
+    image = content.catalog.image["121"];
+  }
+  const contentHTML = `<button class="content" data-id="${
+    content.id
+  }" data-type="${content.type}" data-status="${content.status}">
+    <label>${contentInnerHTML(content)}</label>
+    <div>
+      <div>
+        <h3>${content.catalog.title}</h3>
+        <img loading="lazy" src="${image}" alt="${content.catalog.title}" />
+      </div>
+      <p>${content.catalog.overview}</p>
+    </div>
+  </button>`;
+
+  return contentHTML;
+}
+function addContentToList(content) {
+  let node = htmlToNode(contentToHTML(content));
+  node.addEventListener("click", () => {
+    openModalEdit(node.dataset.id, node.dataset.type);
+  });
+  contentsContainer.insertAdjacentElement("beforeend", node);
+}
+function updateContent(content) {
+  Array.from(contentsContainer.children).forEach((element) => {
+    if (
+      element.dataset.id == content.id &&
+      element.dataset.type == content.type
+    ) {
+      element.children[0].innerHTML = contentInnerHTML(content);
+    }
+  });
+}
+
 const contentsContainer = document.getElementById("contents");
 async function reloadList(hard = false) {
   let contentsData = await getList(hard);
 
   contentsContainer.innerHTML = "";
   contentsData.forEach((content) => {
-    checked = "";
-    if (content.checked) {
-      checked = "checked";
-    }
-
-    const contentHTML = `<button class="content" data-id="${
-      content.id
-    }" data-type="${content.type}" data-status="${
-      content.status
-    }"><label><input type="checkbox" id="checkbox_${content.id
-      .toString()
-      .replaceAll(" ", "_")}" name="checkbox_${content.id
-      .toString()
-      .replaceAll(" ", "_")}" disabled ${checked}/><span>${
-      content.text
-    }</span></label></button>`;
-    contentsContainer.insertAdjacentHTML("beforeend", contentHTML);
+    addContentToList(content);
   });
 
-  const contents = document.getElementsByClassName("content");
-  for (let i = 0; i < contents.length; i++) {
-    contents[i].addEventListener("click", () => {
-      openModalEdit(contents[i].dataset.id, contents[i].dataset.type);
-    });
-  }
+  contentList = contentsData;
 
   search();
 }
@@ -1015,7 +1053,7 @@ async function AddLibrary() {
         deleteLibraryBtn.style.display = "flex";
         giveUpBtn.style.display = "flex";
 
-        haveListChange = true;
+        addContentToList(response.data);
 
         resolve(response);
       } else {
@@ -1025,7 +1063,7 @@ async function AddLibrary() {
   });
 }
 addLibraryBtn.addEventListener("click", () => {
-  sendUpdatePromise.push(AddLibrary());
+  AddLibrary();
 });
 
 function deleteList(type, id) {
@@ -1053,7 +1091,15 @@ async function DeleteLibrary() {
           addLibraryBtn.style.display = "flex";
           deleteLibraryBtn.style.display = "none";
           giveUpBtn.style.display = "none";
-          haveListChange = true;
+
+          Array.from(contentsContainer.children).forEach((content) => {
+            if (
+              content.dataset.id == modalEdit.dataset.id &&
+              content.dataset.type == modalEdit.dataset.type
+            ) {
+              contentsContainer.removeChild(content);
+            }
+          });
 
           resolve(response);
         } else {
@@ -1064,7 +1110,7 @@ async function DeleteLibrary() {
   });
 }
 deleteLibraryBtn.addEventListener("click", () => {
-  sendUpdatePromise.push(DeleteLibrary());
+  DeleteLibrary();
 });
 
 reloadList();
@@ -1094,7 +1140,7 @@ async function GiveUp() {
         if (response.status == "success") {
           giveUpBtn.style.display = "none";
           ungiveUpBtn.style.display = "flex";
-          haveListChange = true;
+          updateContent(response.data);
 
           resolve(response);
         } else {
@@ -1111,7 +1157,7 @@ async function UngiveUp() {
         if (response.status == "success") {
           giveUpBtn.style.display = "flex";
           ungiveUpBtn.style.display = "none";
-          haveListChange = true;
+          updateContent(response.data);
 
           resolve(response);
         } else {
@@ -1122,10 +1168,10 @@ async function UngiveUp() {
   });
 }
 ungiveUpBtn.addEventListener("click", () => {
-  sendUpdatePromise.push(UngiveUp());
+  UngiveUp();
 });
 giveUpBtn.addEventListener("click", () => {
-  sendUpdatePromise.push(GiveUp());
+  GiveUp();
 });
 
 async function sendRank(type, id, rank) {
@@ -1157,7 +1203,7 @@ async function updateRank(type, id, rank) {
   return new Promise((resolve, reject) => {
     sendRank(type, id, rank).then((response) => {
       if (response.status == "success") {
-        haveListChange = true;
+        updateContent(response.data);
 
         resolve(response);
       } else {

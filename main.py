@@ -58,7 +58,7 @@ if os.getenv("ENV") != "production":
 VAPID_PUBLIC_KEY = os.getenv("VAPID_PUBLIC_KEY")
 VAPID_PRIVATE_KEY = os.getenv("VAPID_PRIVATE_KEY")
 
-debug = False
+debug = True
 testing = False
 
 if os.getenv("ENV") == "production":
@@ -422,8 +422,9 @@ def hard_reload_endpoint():
 def add_user_list(type: str, id: str):
     if ["movie", "tv", "book", "books"].count(type) == 0:
         abort(400)
-    if add_ulist(session["user"]["id"], type, id):
-        return jsonify({"status": "success"}), 201
+    result = add_ulist(session["user"]["id"], type, id)
+    if result is not None:
+        return jsonify({"status": "success", "data": result}), 201
     return jsonify({"status": "error"}), 400
 
 
@@ -447,13 +448,15 @@ def update_user_list(type: str, id: str):
         abort(400)
 
     if "season_number" in request.json and "changes" in request.json:
-        return update_ucatalog(
+        result = update_ucatalog(
             user_id=session["user"]["id"],
             type=type,
             id=id,
             season_number=request.json["season_number"],
             changes=request.json["changes"],
         )
+        if result is not None:
+            return jsonify({"status": "success", "data": result}), 200
     return jsonify({"status": "error"}), 400
 
 
@@ -473,8 +476,9 @@ def get_user_content(type: str, id: str):
 def togle_content_giveup(type, id):
     if ["movie", "tv", "book", "books"].count(type) == 0:
         abort(400)
-    if toggle_giveup(user_id=session["user"]["id"], type=type, id=id):
-        return jsonify({"status": "success"}), 200
+    result = toggle_giveup(user_id=session["user"]["id"], type=type, id=id)
+    if result is not None:
+        return jsonify({"status": "success", "data": result}), 200
     return jsonify({"status": "error"}), 400
 
 
@@ -485,13 +489,14 @@ def togle_content_giveup(type, id):
 def set_content_rank(type, id):
     if ["movie", "tv", "book", "books"].count(type) == 0:
         abort(400)
-    if set_rank(
+    result = set_rank(
         user_id=session["user"]["id"],
         type=type,
         id=id,
         rank=request.json["rank"],
-    ):
-        return jsonify({"status": "success"}), 200
+    )
+    if result is not None:
+        return jsonify({"status": "success", "data": result}), 200
     return jsonify({"status": "error"}), 400
 
 

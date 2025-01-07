@@ -648,7 +648,66 @@ def get_user_ulist(id: int) -> list:
         list: La liste des éléments de l'utilisateur
     """
 
-    return db.get_collection("ulist").find_one({"id": id}, {"list": 1})["list"]
+    pipeline = [
+        # Étape 1 : Filtrer par _id
+        {"$match": {"id": 0}},
+        # Étape 2 : Décomposer la liste `list`
+        {"$unwind": "$list"},
+        # Étape 3 : Rejoindre avec `catalog` sur `id` et `type`
+        {
+            "$lookup": {
+                "from": "catalog",  # Collection à joindre
+                "let": {
+                    "list_id": "$list.id",  # ID de l'élément dans `list`
+                    "list_type": "$list.type",  # Type de l'élément dans `list`
+                },
+                "pipeline": [
+                    {
+                        "$match": {
+                            "$expr": {
+                                "$and": [
+                                    {"$eq": ["$type", "$$list_type"]},  # Match type
+                                    {
+                                        "$eq": [
+                                            "$original_id",
+                                            "$$list_id",
+                                        ]
+                                    },
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "$project": {  # Ne garder que les champs nécessaires
+                            "_id": 0,
+                            "image": 1,
+                            "overview": 1,
+                            "title": 1,
+                        }
+                    },
+                ],
+                "as": "catalog_info",
+            }
+        },
+        # Étape 4 : Filtrer pour ne garder que les catalogues trouvés
+        {"$match": {"catalog_info": {"$ne": []}}},
+        # Étape 5 : Simplifier la structure des résultats
+        {
+            "$project": {
+                "_id": 0,
+                "id": "$list.id",
+                "type": "$list.type",
+                "text": "$list.text",
+                "checked": "$list.checked",
+                "status": "$list.status",
+                "catalog": {
+                    "$arrayElemAt": ["$catalog_info", 0]
+                },  # Prendre le premier élément trouvé
+            }
+        },
+    ]
+    results = db.ulist.aggregate(pipeline)
+    return list(results)
 
 
 default_lexicon = {
@@ -921,7 +980,7 @@ def add_ulist(user_id: int, type: str, id: str):
         {"title": 1, "type": 1, "contents": 1, "original_id": 1, "finished": 1},
     )
     if dcatalog is None:
-        return False
+        return None
 
     text = get_ulist_text(dcatalog, lexicon=get_lexicon(user_id))
 
@@ -950,7 +1009,7 @@ def add_ulist(user_id: int, type: str, id: str):
             "status": "towatch",
         }
     )
-    return True
+    return {"text": text, "type": type, "id": id, "status": "towatch", "checked": False}
 
 
 def hard_reload(user_id: int):
@@ -1246,6 +1305,7 @@ def send_update_ucatalog(catalog, ucatalog):
         },
         {"$set": {"watch": ucatalog["watch"], "status": ucatalog["status"]}},
     )
+    text = get_ulist_text(catalog, ucatalog, lexicon)
     db.ulist.update_one(
         {
             "id": ucatalog["user_id"],
@@ -1255,7 +1315,7 @@ def send_update_ucatalog(catalog, ucatalog):
         },
         {
             "$set": {
-                "list.$.text": get_ulist_text(catalog, ucatalog, lexicon),
+                "list.$.text": text,
                 "list.$.status": ucatalog["status"],
                 "list.$.checked": ucatalog["status"] == "done"
                 or ucatalog["status"] == "giveup",
@@ -1263,7 +1323,7 @@ def send_update_ucatalog(catalog, ucatalog):
         },
     )
 
-    return ucatalog["status"]
+    return {"status": ucatalog["status"], "text": text}
 
 
 def update_ucatalog(
@@ -1344,9 +1404,17 @@ def update_ucatalog(
         },
     )
 
-    ucatalog["status"] = send_update_ucatalog(catalog, ucatalog)
+    result = send_update_ucatalog(catalog, ucatalog)
+    ucatalog["status"] = result["status"]
+    checked = ucatalog["status"] == "done" or ucatalog["status"] == "giveup"
 
-    return ucatalog
+    return {
+        "text": result["text"],
+        "type": type,
+        "id": id,
+        "status": ucatalog["status"],
+        "checked": checked,
+    }
 
 
 def toggle_giveup(user_id: int, type: str, id: str):
@@ -1392,18 +1460,26 @@ def toggle_giveup(user_id: int, type: str, id: str):
         {"$set": {"status": ucatalog["status"]}},
     )
 
+    text = get_ulist_text(catalog, ucatalog, lexicon)
+    checked = ucatalog["status"] == "done" or ucatalog["status"] == "giveup"
+
     db.ulist.update_one(
         {"id": user_id, "list": {"$elemMatch": {"id": id, "type": type}}},
         {
             "$set": {
-                "list.$.text": get_ulist_text(catalog, ucatalog, lexicon),
+                "list.$.text": text,
                 "list.$.status": ucatalog["status"],
-                "list.$.checked": ucatalog["status"] == "done"
-                or ucatalog["status"] == "giveup",
+                "list.$.checked": checked,
             }
         },
     )
-    return True
+    return {
+        "text": text,
+        "type": type,
+        "id": id,
+        "status": ucatalog["status"],
+        "checked": checked,
+    }
 
 
 def set_rank(user_id: int, type: str, id: str, rank: str):
@@ -1447,11 +1523,21 @@ def set_rank(user_id: int, type: str, id: str, rank: str):
         {"watch": 1, "rank": 1, "status": 1},
     )
     lexicon = get_lexicon(user_id=user_id)
+
+    text = get_ulist_text(catalog, ucatalog, lexicon)
+    checked = ucatalog["status"] == "done" or ucatalog["status"] == "giveup"
+
     db.ulist.update_one(
         {"id": user_id, "list": {"$elemMatch": {"id": id, "type": type}}},
-        {"$set": {"list.$.text": get_ulist_text(catalog, ucatalog, lexicon)}},
+        {"$set": {"list.$.text": text}},
     )
-    return True
+    return {
+        "text": text,
+        "type": type,
+        "id": id,
+        "status": ucatalog["status"],
+        "checked": checked,
+    }
 
 
 def get_tierlist(user_id: int) -> dict:

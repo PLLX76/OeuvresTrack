@@ -29,7 +29,7 @@ def process_update(element, new_data, extra_fields=None):
     )
 
 
-def update_tv_seasons(element, operation):
+def update_tv_seasons(element: dict, operation: list):
     """Gère la mise à jour des saisons pour les séries TV."""
     finished = True
 
@@ -172,7 +172,7 @@ def check_update_catalog():
             elif element["type"] == "tv":
                 new_data = api.get_tv_by_id(element["original_id"])
 
-                contents = new_data["contents"]
+                contents: list[dict] = new_data["contents"]
                 finished = all([content.get("finished", True) for content in contents])
                 operation.append(
                     process_update(
@@ -239,6 +239,10 @@ def check_update_catalog():
                 if new_data["contents"] != element["contents"]:
                     have_change = True
                     element["contents"] = new_data["contents"]
+
+                if new_data["finished"] != element["finished"]:
+                    have_change = True
+                    element["finished"] = new_data["finished"]
 
         if have_change is True:
             for ucatalog in api.db.ucatalog.find(

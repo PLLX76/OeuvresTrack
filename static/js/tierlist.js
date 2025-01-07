@@ -12,47 +12,47 @@ function initializeDraggables() {
       sendRankUpdate(draggable);
     });
 
-    draggable.addEventListener("touchstart", (e) => {
-      draggable.classList.add("dragging");
-      e.preventDefault();
-    });
+    // draggable.addEventListener("touchstart", (e) => {
+    //   draggable.classList.add("dragging");
+    //   e.preventDefault();
+    // });
 
-    draggable.addEventListener("touchend", (e) => {
-      draggable.classList.remove("dragging");
-      const touch = e.changedTouches[0];
-      const container = document
-        .elementFromPoint(touch.clientX, touch.clientY)
-        .closest(".container");
+    // draggable.addEventListener("touchend", (e) => {
+    //   draggable.classList.remove("dragging");
+    //   const touch = e.changedTouches[0];
+    //   const container = document
+    //     .elementFromPoint(touch.clientX, touch.clientY)
+    //     .closest(".container");
 
-      draggable.dataset.rank = container.dataset.rank;
+    //   draggable.dataset.rank = container.dataset.rank;
 
-      if (container) {
-        const afterElement = getDragAfterElement(container, touch.clientX);
-        if (afterElement == null) {
-          container.appendChild(draggable);
-        } else {
-          container.insertBefore(draggable, afterElement);
-        }
-      }
+    //   if (container) {
+    //     const afterElement = getDragAfterElement(container, touch.clientX);
+    //     if (afterElement == null) {
+    //       container.appendChild(draggable);
+    //     } else {
+    //       container.insertBefore(draggable, afterElement);
+    //     }
+    //   }
 
-      sendRankUpdate(draggable);
-    });
+    //   sendRankUpdate(draggable);
+    // });
 
-    draggable.addEventListener("touchmove", (e) => {
-      e.preventDefault();
-      const touch = e.touches[0];
-      const container = document
-        .elementFromPoint(touch.clientX, touch.clientY)
-        .closest(".container");
-      if (container) {
-        const afterElement = getDragAfterElement(container, touch.clientX);
-        if (afterElement == null) {
-          container.appendChild(draggable);
-        } else {
-          container.insertBefore(draggable, afterElement);
-        }
-      }
-    });
+    // draggable.addEventListener("touchmove", (e) => {
+    //   e.preventDefault();
+    //   const touch = e.touches[0];
+    //   const container = document
+    //     .elementFromPoint(touch.clientX, touch.clientY)
+    //     .closest(".container");
+    //   if (container) {
+    //     const afterElement = getDragAfterElement(container, touch.clientX);
+    //     if (afterElement == null) {
+    //       container.appendChild(draggable);
+    //     } else {
+    //       container.insertBefore(draggable, afterElement);
+    //     }
+    //   }
+    // });
   });
 
   containers.forEach((container) => {

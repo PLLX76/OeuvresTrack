@@ -280,6 +280,28 @@ nav img {
   cursor: pointer;
   text-align: start;
 }
+*.content > div {
+  display: none;
+}
+@media screen and (min-width: 700px) {
+  *.content > div {
+    align-items: center;
+
+    text-align: left;
+
+    font-size: 14px;
+    line-height: 14px;
+    overflow: hidden;
+  }
+  *.content > div > div > img {
+    padding: 5px;
+    border-radius: 15px;
+  }
+  *.content:hover > div {
+    display: flex;
+    padding: 10px;
+  }
+}
 del {
   text-decoration-thickness: 0.1rem;
 }
