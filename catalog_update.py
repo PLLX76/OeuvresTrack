@@ -33,7 +33,7 @@ def update_tv_seasons(element: dict, operation: list):
     """Gère la mise à jour des saisons pour les séries TV."""
     finished = True
 
-    new_data = {"contents": []}
+    new_data = {"contents": [], "finished": True}
 
     have_notification = False
 
@@ -92,6 +92,8 @@ def update_tv_seasons(element: dict, operation: list):
                 {"$set": {"finished": finished}},
             )
         )
+
+    new_data["finished"] = finished
 
     return new_data
 
