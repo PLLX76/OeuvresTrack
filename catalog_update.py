@@ -217,6 +217,7 @@ def check_update_catalog():
                 else:
                     for i, content in enumerate(contents):
                         if content["contents"] != element["contents"][i]["contents"]:
+                            have_to_break = False
                             for j, episode in enumerate(content["contents"]):
                                 if len(element["contents"][i]["contents"]) < j + 1:
                                     api.send_notification_changes(
@@ -229,7 +230,10 @@ def check_update_catalog():
                                         },
                                     )
                                     have_change = True
+                                    have_to_break = True
                                     break
+                            if have_to_break:
+                                break
 
                 if have_change:
                     element["contents"] = contents
