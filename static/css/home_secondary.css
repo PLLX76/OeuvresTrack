@@ -629,7 +629,8 @@ body:has(#sidebar.open) {
   #search {
     color: white;
   }
-  .content:hover {
+  .content:hover,
+  .content > div {
     background-color: rgb(60, 60, 60);
   }
   #sidebar {
