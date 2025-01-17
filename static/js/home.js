@@ -1010,6 +1010,7 @@ function updateContent(content) {
       element.dataset.id == content.id &&
       element.dataset.type == content.type
     ) {
+      element.dataset.status = content.status;
       element.children[0].innerHTML = contentInnerHTML(content);
     }
   });
@@ -1208,6 +1209,12 @@ async function updateRank(type, id, rank) {
     sendRank(type, id, rank).then((response) => {
       if (response.status == "success") {
         updateContent(response.data);
+        
+        if (addLibraryBtn.style.display == "flex") {
+          addLibraryBtn.style.display = "none";
+          deleteLibraryBtn.style.display = "flex";
+          giveUpBtn.style.display = "flex";
+        }
 
         resolve(response);
       } else {

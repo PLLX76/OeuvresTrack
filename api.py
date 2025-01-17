@@ -1507,6 +1507,11 @@ def set_rank(user_id: int, type: str, id: str, rank: str):
         if id.isdigit():
             id = int(id)
 
+    ucatalog = get_ucatalog(user_id=user_id, type=type, id=id)
+    if ucatalog["exist"] is False:
+        add_ulist(user_id, type, id)
+        ucatalog = get_ucatalog(user_id=user_id, type=type, id=id)
+
     # update ucatalog
     db.ucatalog.update_one(
         {"user_id": user_id, "type": type, "id": id},
@@ -1518,10 +1523,7 @@ def set_rank(user_id: int, type: str, id: str, rank: str):
         {"original_id": id, "type": type},
         {"title": 1, "type": 1, "contents": 1, "finished": 1},
     )
-    ucatalog = db.get_collection("ucatalog").find_one(
-        {"user_id": user_id, "type": type, "id": id},
-        {"watch": 1, "rank": 1, "status": 1},
-    )
+    ucatalog["rank"] = rank
     lexicon = get_lexicon(user_id=user_id)
 
     text = get_ulist_text(catalog, ucatalog, lexicon)
