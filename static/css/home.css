@@ -307,6 +307,11 @@ nav img {
     pointer-events: none;
     transition: all 0.3s ease-in-out;
   }
+  *.content[data-position="bottom"] > div {
+    top: auto;
+    bottom: 25px;
+    border-radius: 15px 15px 0px 0px;
+  }
   *.content > div > div > img {
     padding: 5px;
     border-radius: 15px;

@@ -1209,7 +1209,7 @@ async function updateRank(type, id, rank) {
     sendRank(type, id, rank).then((response) => {
       if (response.status == "success") {
         updateContent(response.data);
-        
+
         if (addLibraryBtn.style.display == "flex") {
           addLibraryBtn.style.display = "none";
           deleteLibraryBtn.style.display = "flex";
@@ -1381,7 +1381,7 @@ checkModalAlreadyOpen();
 if ("serviceWorker" in navigator && "PushManager" in window) {
   navigator.serviceWorker
     .register("/sw.js", {
-      scope: ".",
+      scope: "/",
     })
     .then(function (registration) {
       console.log("Service Worker registered with scope:", registration.scope);
@@ -1414,3 +1414,25 @@ if ("serviceWorker" in navigator && "PushManager" in window) {
       console.log("Service Worker registration failed:", error);
     });
 }
+
+function updateButtonPositions() {
+  document.querySelectorAll(".content").forEach((button) => {
+    const rect = button.getBoundingClientRect();
+    const windowHeight = window.innerHeight;
+
+    // Si le bouton est proche du bas de l'écran, ajoute "bottom"
+    if (rect.bottom + 230 > windowHeight) {
+      // 200px est la hauteur approximative du div
+      button.setAttribute("data-position", "bottom");
+    } else {
+      button.setAttribute("data-position", "top");
+    }
+  });
+}
+
+// Ajoute un écouteur pour mettre à jour les positions lors du scroll ou du redimensionnement
+window.addEventListener("scroll", updateButtonPositions);
+window.addEventListener("resize", updateButtonPositions);
+
+// Exécute la fonction au chargement initial
+updateButtonPositions();
