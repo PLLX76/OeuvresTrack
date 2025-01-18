@@ -1012,6 +1012,7 @@ function updateContent(content) {
     ) {
       element.dataset.status = content.status;
       element.children[0].innerHTML = contentInnerHTML(content);
+      search();
     }
   });
 }

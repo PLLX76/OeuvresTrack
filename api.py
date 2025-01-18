@@ -1261,7 +1261,9 @@ def get_status(
                 uelement = next(iter(ucatalog["watch"]), {})
 
             if uelement == {}:
-                if len(s["contents"]) > 0:
+                if (len(s["contents"]) > 0 and s["finished"] is True) or len(
+                    s["contents"]
+                ) > 1:
                     finished = False
                 continue
 
@@ -1271,7 +1273,9 @@ def get_status(
             if len(uelement["watched"]) == 1:
                 if int(uelement["watched"][0].split("-")[-1]) != len(s["contents"]):
                     finished = False
-            elif len(s["contents"]) > 0:
+            elif (len(s["contents"]) > 0 and s["finished"] is True) or len(
+                s["contents"]
+            ) > 1:
                 finished = False
     else:
         finished = ucatalog["watch"]
