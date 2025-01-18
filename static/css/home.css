@@ -383,13 +383,10 @@ main {
 
   width: 50px;
   height: 50px;
-
   border: 1px solid black;
 
   display: -webkit-box;
-
   display: -ms-flexbox;
-
   display: flex;
   -webkit-box-pack: center;
   -ms-flex-pack: center;
@@ -399,10 +396,10 @@ main {
   align-items: center;
 
   -webkit-transition: background-color 0.1s;
-
   -o-transition: background-color 0.1s;
-
   transition: background-color 0.1s;
+
+  z-index: 1;
 }
 #add-btn img {
   width: 40px;
