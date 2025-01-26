@@ -987,11 +987,11 @@ function contentToHTML(content) {
   }" data-type="${content.type}" data-status="${content.status}">
     <label>${contentInnerHTML(content)}</label>
     <div>
+      <h3>${content.catalog.title}</h3>
       <div>
-        <h3>${content.catalog.title}</h3>
         <img loading="lazy" src="${image}" alt="${content.catalog.title}" />
+        <p>${content.catalog.overview}</p>
       </div>
-      <p>${content.catalog.overview}</p>
     </div>
   </button>`;
 

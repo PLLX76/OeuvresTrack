@@ -287,7 +287,7 @@ nav img {
 }
 @media screen and (min-width: 700px) {
   *.content > div {
-    display: flex;
+    display: block;
     position: absolute;
     top: 25px;
     left: 0;
@@ -311,6 +311,18 @@ nav img {
     top: auto;
     bottom: 25px;
     border-radius: 15px 15px 0px 0px;
+  }
+  *.content > div > div {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: row;
+    flex-direction: row;
+  }
+  *.content p {
+    padding: 8px;
   }
   *.content > div > div > img {
     padding: 5px;
