@@ -514,6 +514,7 @@ def get_recommandate_date(data: dict, type: str) -> str:
     if type == "tv":
         if (
             data["first_air_date"] is not None
+            or date["first_air_date"] != ""
             and (date.fromisoformat(data["first_air_date"]) + timedelta(days=14))
             > date.today()
         ):
@@ -521,6 +522,7 @@ def get_recommandate_date(data: dict, type: str) -> str:
     elif type == "movie":
         if (
             data["release_date"] is not None
+            or date["first_air_date"] != ""
             and (date.fromisoformat(data["release_date"]) + timedelta(days=14))
             > date.today()
         ):
