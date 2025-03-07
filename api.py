@@ -1768,5 +1768,5 @@ def send_notification_changes(element: dict, change: dict):
                 user["user_id"],
                 title,
                 body,
-                url=f"/{element['type']}/{element['original_id']}/",
+                url=f"/app/{element['type']}/{element['original_id']}/",
             )
