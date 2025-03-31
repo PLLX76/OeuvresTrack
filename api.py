@@ -979,7 +979,7 @@ def add_ulist(user_id: int, type: str, id: str):
 
     dcatalog = db.catalog.find_one(
         {"original_id": id, "type": type},
-        {"title": 1, "type": 1, "contents": 1, "original_id": 1, "finished": 1},
+        {"title": 1, "image":1, "type": 1, "contents": 1, "original_id": 1, "finished": 1, "overview": 1},
     )
     if dcatalog is None:
         return None
@@ -1011,7 +1011,7 @@ def add_ulist(user_id: int, type: str, id: str):
             "status": "towatch",
         }
     )
-    return {"text": text, "type": type, "id": id, "status": "towatch", "checked": False}
+    return {"text": text, "type": type, "id": id, "status": "towatch", "checked": False, "catalog": {"image": dcatalog["image"], "title": dcatalog["title"], "overview": dcatalog["overview"]}}
 
 
 def hard_reload(user_id: int):
