@@ -63,7 +63,7 @@
           "src": "/static/icons/add.svg",
           "type": "image/svg+xml",
           "sizes": "24x24"
-        }, 
+        },
         {
           "src": "/static/icons/add_96dp.svg",
           "type": "image/svg+xml",
