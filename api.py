@@ -463,7 +463,7 @@ def get_books_by_id(id: str) -> dict:
     }
     r["contents"] = [{"title": "Tomes :", "contents": []}]
     for i in (
-        result.split('<article class="liste" >')[1]
+        result.split('<article class="liste">')[1]
         .split('<div style="clear: left">')[0]
         .split('<div class="book col-xs-12 col-xs1-12 col-sm-12">')[1:]
     ):
