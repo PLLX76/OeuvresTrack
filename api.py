@@ -652,7 +652,7 @@ def get_user_ulist(id: int) -> list:
 
     pipeline = [
         # Étape 1 : Filtrer par _id
-        {"$match": {"id": 0}},
+        {"$match": {"id": id}},
         # Étape 2 : Décomposer la liste `list`
         {"$unwind": "$list"},
         # Étape 3 : Rejoindre avec `catalog` sur `id` et `type`
@@ -979,7 +979,15 @@ def add_ulist(user_id: int, type: str, id: str):
 
     dcatalog = db.catalog.find_one(
         {"original_id": id, "type": type},
-        {"title": 1, "image":1, "type": 1, "contents": 1, "original_id": 1, "finished": 1, "overview": 1},
+        {
+            "title": 1,
+            "image": 1,
+            "type": 1,
+            "contents": 1,
+            "original_id": 1,
+            "finished": 1,
+            "overview": 1,
+        },
     )
     if dcatalog is None:
         return None
@@ -1011,7 +1019,18 @@ def add_ulist(user_id: int, type: str, id: str):
             "status": "towatch",
         }
     )
-    return {"text": text, "type": type, "id": id, "status": "towatch", "checked": False, "catalog": {"image": dcatalog["image"], "title": dcatalog["title"], "overview": dcatalog["overview"]}}
+    return {
+        "text": text,
+        "type": type,
+        "id": id,
+        "status": "towatch",
+        "checked": False,
+        "catalog": {
+            "image": dcatalog["image"],
+            "title": dcatalog["title"],
+            "overview": dcatalog["overview"],
+        },
+    }
 
 
 def hard_reload(user_id: int):

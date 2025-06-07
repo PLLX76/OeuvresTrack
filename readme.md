@@ -8,10 +8,6 @@ OeuvresTrack is your ultimate companion for keeping up with the latest releases 
 
 Tired of manually checking for new episodes, seasons, or book installments? OeuvresTrack automates this process. Add items to your list, track what you've watched or read, and get alerted when new content drops. The application fetches data from sources like The Movie Database (TMDB) for movies and TV shows, and Booknode for books, ensuring you have access to a wide range of media.
 
-## Known Issues
-
-- **Concurrency Issues:** The application may experience unexpected behavior or data inconsistencies when multiple users access and modify the same resources concurrently. This needs to be addressed with appropriate locking mechanisms or database transaction management.
-
 ## Key Features
 
 - **Personalized Media Lists:** Create and manage lists of movies, TV shows, and books you're interested in, currently watching/reading, or have completed.

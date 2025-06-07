@@ -320,7 +320,9 @@ def subscribe():
 
 @app.route("/api/new/<type>/<query>", methods=["GET"])
 @login_required
-@conditional_decorator(cache.cached(timeout=60 * 20), not debug)
+@conditional_decorator(
+    cache.cached(timeout=60 * 20, make_cache_key=get_user_id_key), not debug
+)
 def api_new_query(type: str, query: str):
     if query is not None and len(query) < 1:
         abort(400)
