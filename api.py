@@ -386,14 +386,14 @@ def get_book_by_id(id: str) -> dict:
     if result.status_code != 200:
         return None
     result = result.text
-
+    
     basic_image = result.split('class="max_width " itemprop="image" src="')[1].split(
         '">'
     )[0]
 
     r = {
         "title": html.unescape(
-            result.split('<h1 itemprop="name">')[1].split("</h1>")[0]
+            result.split('<h1 itemprop="name" style="margin-bottom:0px">')[1].split("</h1>")[0]
         ),
         "overview": html.unescape(
             result.split("<p><span class=resume-title>Résumé</span></p><p>")[1].split(
