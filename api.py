@@ -386,13 +386,15 @@ def get_book_by_id(id: str) -> dict:
     result = scraper.get("https://booknode.com/id_" + id)
     if result.status_code != 200:
         return None
-    soup = BeautifulSoup(result.text, "html.parser")
+    result = result.text
 
-    basic_image = soup.find("img", {"class": "max_width", "itemprop": "image"}).attrs["src"]
-    
+    basic_image = result.split('class="max_width " itemprop="image" src="')[1].split(
+        '">'
+    )[0]
+
     r = {
         "title": html.unescape(
-            soup.h1.text
+            result.split('<h1 itemprop="name">')[1].split("</h1>")[0]
         ),
         "overview": html.unescape(
             soup.h1.parent.find("span", {"class": "actual-text"}).text.replace("Résumé", "").strip()
