@@ -1285,7 +1285,7 @@ function openModalTierlist() {
         }
         container.insertAdjacentHTML(
           "beforeend",
-          `<a class="draggable" data-type="${catalog["type"]}" data-id="${catalog["id"]}" draggable="true" href="/app/${catalog["type"]}/${catalog["id"]}/"><img src="${image}" alt="${catalog["title"]} image" title="${catalog["title"]}"/></a>`
+          `<button class="draggable" data-type="${catalog["type"]}" data-id="${catalog["id"]}" draggable="true"><img src="${image}" alt="${catalog["title"]} image" title="${catalog["title"]}"/></button>`
         );
       });
     });

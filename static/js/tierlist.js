@@ -3,6 +3,8 @@ function initializeDraggables() {
   const containers = document.querySelectorAll(".container");
 
   draggables.forEach((draggable) => {
+    initializeButton(draggable);
+
     draggable.addEventListener("dragstart", () => {
       draggable.classList.add("dragging");
     });
@@ -67,6 +69,11 @@ function initializeDraggables() {
         container.insertBefore(draggable, afterElement);
       }
     });
+  });
+}
+function initializeButton(button) {
+  button.addEventListener("click", () => {
+    openModalEdit(button.dataset.id, button.dataset.type);
   });
 }
 function getDragAfterElement(container, x) {
