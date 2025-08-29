@@ -2,6 +2,7 @@ import requests, cloudscraper, html, re, json, os
 from pymongo import MongoClient, UpdateOne
 from passlib.hash import pbkdf2_sha256
 from datetime import date, timedelta
+from bs4 import BeautifulSoup
 
 VAPID_PUBLIC_KEY = os.getenv("VAPID_PUBLIC_KEY")
 VAPID_PRIVATE_KEY = os.getenv("VAPID_PRIVATE_KEY")
@@ -385,20 +386,16 @@ def get_book_by_id(id: str) -> dict:
     result = scraper.get("https://booknode.com/id_" + id)
     if result.status_code != 200:
         return None
-    result = result.text
+    soup = BeautifulSoup(result.text, "html.parser")
 
-    basic_image = result.split('class="max_width " itemprop="image" src="')[1].split(
-        '">'
-    )[0]
-
+    basic_image = soup.find("img", {"class": "max_width", "itemprop": "image"}).attrs["src"]
+    
     r = {
         "title": html.unescape(
-            result.split('<h1 itemprop="name">')[1].split("</h1>")[0]
+            soup.h1.text
         ),
         "overview": html.unescape(
-            result.split("<p><span class=resume-title>Résumé</span></p><p>")[1].split(
-                "</p>"
-            )[0]
+            soup.h1.parent.find("span", {"class": "actual-text"}).text.replace("Résumé", "").strip()
         ).removesuffix("\n"),
         "image": {
             "264": basic_image,
@@ -430,45 +427,37 @@ def get_books_by_id(id: str) -> dict:
     result = scraper.get("https://booknode.com/serie/" + str(id))
     if result.status_code != 200:
         return None
-    result = result.text
+    soup = BeautifulSoup(result.text, "html.parser")
+    
+    basic_image = soup.find("article", {"class": "liste"}).find("img").attrs["data-src"].replace(".jpg", ".webp").replace(".png", ".webp")
     r = {
         "title": html.unescape(
-            result.split('<h1><span itemprop="name">')[1].split("</span>")[0]
+            soup.h1.find("span").text
         ),
         "overview": re.sub(
             " +",
             " ",
             html.unescape(
-                result.split(
-                    '<div class="js-readmore" data-maxwords="50" data-maxchars="240">'
-                )[1].split("</div>")[0]
+                soup.find("div", {"class": "js-readmore", "data-maxwords": "50", "data-maxchars": "240"}).text
             ),
         )
         .removesuffix("\n ")
         .removeprefix("\n "),
         "image": {
-            "264": result.split('data-src="')[1].split('"')[0],
-            "121": result.split('data-src="')[1]
-            .split('"')[0]
-            .replace("264-432", "121-198"),
-            "66": result.split('data-src="')[1]
-            .split('"')[0]
-            .replace("264-432", "66-108"),
-            "30": result.split('data-src="')[1]
-            .split('"')[0]
-            .replace("264-432", "30-40"),
+            "264": basic_image,
+            "121": basic_image.replace("264-432", "121-198"),
+            "66": basic_image.replace("264-432", "66-108"),
+            "30": basic_image.replace("264-432", "30-40"),
         },
         "source": "booknode",
         "id": id,
     }
     r["contents"] = [{"title": "Tomes :", "contents": []}]
     for i in (
-        result.split('<article class="liste">')[1]
-        .split('<div style="clear: left">')[0]
-        .split('<div class="book col-xs-12 col-xs1-12 col-sm-12">')[1:]
+        soup.find("article", {"class": "liste"}).find_all("div", {"class": "book col-xs-12 col-xs1-12 col-sm-12"})
     ):
         r["contents"][0]["contents"].append(
-            html.unescape(i.split('<a title="')[1].split('"')[0])
+            html.unescape(i.find("a").attrs["title"])
         )
     return r
 

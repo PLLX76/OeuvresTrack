@@ -10,3 +10,4 @@ flask-talisman
 flask-limiter
 discord_webhook
 python-dotenv
+beautifulsoup4
