@@ -1,6 +1,7 @@
 var theme = "light";
 var originalTheme = "system";
 var contentList = [];
+var card = false; // also need to add card class to contents
 
 function detectColorScheme() {
   if (localStorage.getItem("theme")) {
@@ -988,15 +989,19 @@ function contentInnerHTML(content) {
   return innerHTML;
 }
 function contentToHTML(content) {
-  let image = "";
-  if (content.type == "tv" || content.type == "movie") {
-    image = "https://image.tmdb.org/t/p/w200" + content.catalog.image.backdrop;
-  } else {
-    image = content.catalog.image["121"];
-  }
-  const contentHTML = `<button class="content" data-id="${
-    content.id
-  }" data-type="${content.type}" data-status="${content.status}">
+  let contentHTML = "";
+  if (!card) {
+    let image = "";
+    if (content.type == "tv" || content.type == "movie") {
+      image =
+        "https://image.tmdb.org/t/p/w200" + content.catalog.image.backdrop;
+    } else {
+      image = content.catalog.image["121"];
+    }
+
+    contentHTML = `<button class="content" data-id="${content.id}" data-type="${
+      content.type
+    }" data-status="${content.status}">
     <label>${contentInnerHTML(content)}</label>
     <div>
       <h3>${content.catalog.title}</h3>
@@ -1006,6 +1011,19 @@ function contentToHTML(content) {
       </div>
     </div>
   </button>`;
+  } else {
+    let image = "";
+    if (content.type == "tv" || content.type == "movie") {
+      image = "https://image.tmdb.org/t/p/w200" + content.catalog.image.poster;
+    } else {
+      image = content.catalog.image["264"];
+    }
+
+    contentHTML = `<button class="content card" data-id="${content.id}" data-type="${content.type}" data-status="${content.status}">
+      <img loading="lazy" src="${image}" alt="${content.catalog.title}" />
+      <h3>${content.catalog.title}</h3>
+  </button>`;
+  }
 
   return contentHTML;
 }
@@ -1023,7 +1041,9 @@ function updateContent(content) {
       element.dataset.type == content.type
     ) {
       element.dataset.status = content.status;
-      element.children[0].innerHTML = contentInnerHTML(content);
+      if (!card) {
+        element.children[0].innerHTML = contentInnerHTML(content);
+      }
       search();
     }
   });
