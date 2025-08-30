@@ -665,4 +665,7 @@ body:has(#sidebar.open) {
     background-color: rgb(60, 60, 60);
     color: white;
   }
+  #results-number {
+    color: white;
+  }
 }

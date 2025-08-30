@@ -241,6 +241,11 @@ nav img {
   bottom: 0;
   left: 0;
 } */
+#results-number {
+  color: black;
+  font-family: "Poppins", sans-serif;
+  font-size: small;
+}
 #contents {
   padding: 30px;
   width: calc(100% - 60px);

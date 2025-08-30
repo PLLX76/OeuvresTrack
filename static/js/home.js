@@ -196,6 +196,9 @@ searchBar.addEventListener("input", () => {
 function search() {
   var selectedTypeFiltres = [];
   var selectedStatusFiltres = [];
+
+  let searchResultsNumber = 0;
+
   for (let j = 0; j < filtres.length; j++) {
     if (filtres[j].classList.contains("selected")) {
       if (
@@ -231,10 +234,19 @@ function search() {
         selectedStatusFiltres.length == 0)
     ) {
       content.style.display = "block";
+      searchResultsNumber++;
     } else {
       content.style.display = "none";
     }
   });
+
+  let resultsNumber = document.getElementById("results-number");
+
+  if (searchResultsNumber == 0) {
+    resultsNumber.innerText = "aucun résultat";
+  } else {
+    resultsNumber.innerText = searchResultsNumber + " résultats";
+  }
 }
 
 function getContentData(type, id) {
@@ -1021,7 +1033,7 @@ const contentsContainer = document.getElementById("contents");
 async function reloadList(hard = false) {
   let contentsData = await getList(hard);
 
-  contentsContainer.innerHTML = "";
+  contentsContainer.innerHTML = "<p id=results-number></p>";
   contentsData.forEach((content) => {
     addContentToList(content);
   });
