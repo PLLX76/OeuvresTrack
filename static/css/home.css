@@ -455,8 +455,13 @@ a {
 }
 
 :root {
-  --main-color: #ecf0f1;
+  --main-color: whitesmoke;
   --point-color: #555;
+  --size: 5px;
+}
+[data-theme="dark"] {
+  --main-color: #1a1a1a;
+  --point-color: #ccc;
   --size: 5px;
 }
 
