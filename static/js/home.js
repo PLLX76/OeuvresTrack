@@ -199,12 +199,11 @@ function partialRatio(str1, str2) {
 }
 
 const handleSearch = debounce(() => {
-  console.log("search");
   search();
-}, 250);
+}, 200);
 
 let searchBar = document.getElementById("search");
-searchBar.addEventListener("input", () => handleSearch);
+searchBar.addEventListener("input", handleSearch);
 
 function search() {
   var selectedTypeFiltres = [];
