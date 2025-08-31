@@ -61,7 +61,7 @@ nav button {
   transition: background-color 0.1s;
 }
 nav input {
-  width: calc(100% - 110px / 3 - 30px);
+  width: calc(100% - 110px / 3 - 30px - 50px);
   height: 40px;
 
   border-radius: 10px;
@@ -99,6 +99,8 @@ nav img {
   z-index: 3;
 
   max-width: 0;
+  will-change: max-width;
+
   -webkit-transition: max-width 0.25s ease;
   -o-transition: max-width 0.25s ease;
   transition: max-width 0.25s ease;
@@ -250,14 +252,16 @@ nav img {
   padding: 30px;
   width: calc(100% - 60px);
 }
-#contents.card {
+#contents.cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-auto-rows: 1fr;
+
   grid-gap: 20px;
   justify-items: center;
   align-items: center;
 }
-#contents.card #results-number {
+#contents.cards #results-number {
   display: none;
 }
 *.content {
@@ -301,18 +305,7 @@ nav img {
   display: none;
 }
 *.content.card {
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  -webkit-box-pack: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-
-  height: 380px;
+  height: 100%;
 
   border-radius: 10px;
   -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12),
@@ -327,21 +320,28 @@ nav img {
     0 10px 10px rgba(0, 0, 0, 0.22);
   box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
 }
-*.content.card > label {
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-}
 *.content.card img {
   border-radius: 10px;
   width: 200px;
+  object-fit: contain;
 }
 *.content.card h3 {
   max-height: 50px;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+}
+@media screen and (max-width: 540px) {
+  #contents.cards {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-gap: 10px;
+  }
+  *.content.card img {
+    border-radius: 10px;
+    width: calc(100% - 20px);
+    max-height: 330px;
+  }
 }
 @media screen and (min-width: 700px) {
   *.content > div {
@@ -408,6 +408,8 @@ del {
 main {
   position: relative;
   width: 100%;
+  will-change: width, margin-left;
+
   -webkit-transition: 0.25s;
   -o-transition: 0.25s;
   transition: 0.25s;

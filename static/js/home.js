@@ -1,7 +1,16 @@
 var theme = "light";
 var originalTheme = "system";
-var contentList = [];
 var card = false; // also need to add card class to contents
+
+const debounce = (callback, wait) => {
+  let timeoutId = null;
+  return (...args) => {
+    window.clearTimeout(timeoutId);
+    timeoutId = window.setTimeout(() => {
+      callback(...args);
+    }, wait);
+  };
+};
 
 function detectColorScheme() {
   if (localStorage.getItem("theme")) {
@@ -189,10 +198,13 @@ function partialRatio(str1, str2) {
   return Math.round(highestRatio);
 }
 
-let searchBar = document.getElementById("search");
-searchBar.addEventListener("input", () => {
+const handleSearch = debounce(() => {
+  console.log("search");
   search();
-});
+}, 250);
+
+let searchBar = document.getElementById("search");
+searchBar.addEventListener("input", () => handleSearch);
 
 function search() {
   var selectedTypeFiltres = [];
@@ -1058,10 +1070,32 @@ async function reloadList(hard = false) {
     addContentToList(content);
   });
 
-  contentList = contentsData;
-
   search();
 }
+
+if (localStorage.getItem("card") == "true") {
+  card = true;
+  contentsContainer.classList.add("cards");
+}
+
+const listChanger = document.getElementById("list-changer");
+listChanger.addEventListener("click", () => {
+  card = !card;
+  localStorage.setItem("card", card);
+
+  contentsContainer.innerHTML =
+    '<div class="loader"><span class="loader__element"></span><span class="loader__element"></span><span class="loader__element"></span></div>';
+  reloadList();
+
+  img = listChanger.querySelector("img");
+  if (card) {
+    img.src = "/static/icons/list.svg";
+    contentsContainer.classList.add("cards");
+  } else {
+    img.src = "/static/icons/grid_view.svg";
+    contentsContainer.classList.remove("cards");
+  }
+});
 
 function addList(type, id) {
   const url = "/api/user/add/" + type + "/" + id;
