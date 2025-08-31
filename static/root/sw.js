@@ -88,6 +88,10 @@ if (workbox) {
       revision: null,
     },
     {
+      url: "/static/icons/grid_view.svg",
+      revision: null,
+    },
+    {
       url: "/static/icons/info.svg",
       revision: null,
     },
@@ -101,6 +105,10 @@ if (workbox) {
     },
     {
       url: "/static/icons/library_books.svg",
+      revision: null,
+    },
+    {
+      url: "/static/icons/list.svg",
       revision: null,
     },
     {
