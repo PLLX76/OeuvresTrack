@@ -391,7 +391,6 @@ nav img {
   *.content > label:hover ~ div {
     opacity: 1;
     transform: translateY(0);
-    pointer-events: auto;
     padding: 10px;
   }
 }
