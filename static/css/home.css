@@ -290,6 +290,8 @@ nav img {
   border-radius: 5px;
 
   position: relative;
+
+  content-visibility: auto;
 }
 *.content:hover {
   background-color: #f7f5f2;

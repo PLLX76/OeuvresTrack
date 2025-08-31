@@ -1040,9 +1040,21 @@ function contentToHTML(content) {
 }
 function addContentToList(content) {
   let node = htmlToNode(contentToHTML(content));
+  // Pour ouvrir le model avec les informations et l'édition
   node.addEventListener("click", () => {
     openModalEdit(node.dataset.id, node.dataset.type);
   });
+
+  // Désactive l'optimisation pour la liste pour ne pas faire buggé l'animation
+  node.addEventListener("mouseenter", () => {
+    // On désactive l'optimisation quand la souris entre pour que l'animation fonctionne
+    node.style.contentVisibility = "visible";
+  });
+  node.addEventListener("mouseleave", () => {
+    // On la réactive quand la souris quitte
+    node.style.contentVisibility = "auto";
+  });
+
   contentsContainer.insertAdjacentElement("beforeend", node);
 }
 function updateContent(content) {
