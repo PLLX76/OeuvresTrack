@@ -129,6 +129,7 @@ csp = {
         "https://fonts.gstatic.com",
         "https://image.tmdb.org",
         "https://*.booknode.com",
+        "https://cdn.jsdelivr.net"
     ],
     "manifest-src": [
         "'self'",

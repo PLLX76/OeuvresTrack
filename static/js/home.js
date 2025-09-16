@@ -1,6 +1,7 @@
 var theme = "light";
 var originalTheme = "system";
 var card = false; // also need to add card class to contents
+let fuse;
 
 const debounce = (callback, wait) => {
   let timeoutId = null;
@@ -142,122 +143,98 @@ for (let i = 0; i < filtres.length; i++) {
   });
 }
 
-function normalizeText(text) {
-  return text
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^\w]/gi, "");
-}
-
-function levenshtein(a, b) {
-  const matrix = [];
-
-  // Initialiser la matrice
-  for (let i = 0; i <= b.length; i++) {
-    matrix[i] = [i];
-  }
-  for (let j = 0; j <= a.length; j++) {
-    matrix[0][j] = j;
-  }
-
-  // Remplir la matrice
-  for (let i = 1; i <= b.length; i++) {
-    for (let j = 1; j <= a.length; j++) {
-      if (b.charAt(i - 1) === a.charAt(j - 1)) {
-        matrix[i][j] = matrix[i - 1][j - 1];
-      } else {
-        matrix[i][j] = Math.min(
-          matrix[i - 1][j - 1] + 1,
-          matrix[i][j - 1] + 1,
-          matrix[i - 1][j] + 1
-        );
-      }
-    }
-  }
-
-  return matrix[b.length][a.length];
-}
-
-function partialRatio(str1, str2) {
-  const shorter = str1.length < str2.length ? str1 : str2;
-  const longer = str1.length >= str2.length ? str1 : str2;
-
-  let highestRatio = 0;
-
-  for (let i = 0; i <= longer.length - shorter.length; i++) {
-    const substring = longer.substring(i, i + shorter.length);
-    const distance = levenshtein(shorter, substring);
-    const ratio = (1 - distance / shorter.length) * 100;
-
-    if (ratio > highestRatio) {
-      highestRatio = ratio;
-    }
-  }
-
-  return Math.round(highestRatio);
-}
-
 const handleSearch = debounce(() => {
   search();
-}, 200);
+}, 150);
 
 let searchBar = document.getElementById("search");
 searchBar.addEventListener("input", handleSearch);
 
+function updateSearchIndex() {
+  console.log("Mise à jour de l'index de recherche...");
+  const contents = Array.from(document.getElementsByClassName("content"));
+  const itemsToSearch = contents.map((content) => ({
+    title: content.querySelector("span").textContent,
+    type: content.dataset.type,
+    status: content.dataset.status,
+    element: content,
+  }));
+
+  const fuseOptions = { keys: ["title"], includeScore: true, threshold: 0.4 };
+  fuse = new Fuse(itemsToSearch, fuseOptions); // On met à jour la variable globale
+}
+
 function search() {
-  var selectedTypeFiltres = [];
-  var selectedStatusFiltres = [];
+  if (!fuse) return;
 
-  let searchResultsNumber = 0;
+  const searchBarValue = document.getElementById("search").value;
+  const contents = Array.from(document.getElementsByClassName("content"));
 
-  for (let j = 0; j < filtres.length; j++) {
-    if (filtres[j].classList.contains("selected")) {
-      if (
-        ["tv", "movie", "book", "books"].includes(filtres[j].dataset.filtre)
-      ) {
-        selectedTypeFiltres.push(filtres[j].dataset.filtre);
+  // --- Recherche textuelle avec Fuse.js ---
+  let textResults;
+  if (searchBarValue.trim() === "") {
+    // Si la barre de recherche est vide, on prend tous les éléments
+    const itemsToSearch = contents.map((content) => ({
+      title: content.querySelector("span").textContent,
+      type: content.dataset.type,
+      status: content.dataset.status,
+      element: content,
+    }));
 
-        if (filtres[j].dataset.filtre == "book") {
-          selectedTypeFiltres.push("books");
-        }
-      }
-      if (
-        ["onwatch", "towatch", "done", "giveup"].includes(
-          filtres[j].dataset.filtre
-        )
-      ) {
-        selectedStatusFiltres.push(filtres[j].dataset.filtre);
-      }
-    }
+    textResults = itemsToSearch;
+  } else {
+    // Sinon, on utilise Fuse.js
+    // .map(item => item.item) pour ne récupérer que l'objet original
+    textResults = fuse.search(searchBarValue).map((result) => result.item);
   }
 
-  var contents = document.getElementsByClassName("content");
-  Array.from(contents).forEach((content) => {
-    if (
-      (partialRatio(
-        normalizeText(content.innerText),
-        normalizeText(searchBar.value)
-      ) >= 80 ||
-        searchBar.value == "") &&
-      (selectedTypeFiltres.includes(content.dataset.type) ||
-        selectedTypeFiltres.length == 0) &&
-      (selectedStatusFiltres.includes(content.dataset.status) ||
-        selectedStatusFiltres.length == 0)
-    ) {
-      content.style.display = "block";
-      searchResultsNumber++;
-    } else {
-      content.style.display = "none";
-    }
+  // --- Récupération des filtres (version plus moderne) ---
+  const allFiltres = Array.from(
+    document.querySelectorAll(".filtres .selected")
+  );
+
+  const selectedTypeFiltres = allFiltres
+    .map((f) => f.dataset.filtre)
+    .filter((f) => ["tv", "movie", "book", "books"].includes(f));
+  // Cas spécial pour 'book'
+  if (selectedTypeFiltres.includes("book")) {
+    selectedTypeFiltres.push("books");
+  }
+
+  const selectedStatusFiltres = allFiltres
+    .map((f) => f.dataset.filtre)
+    .filter((f) => ["onwatch", "towatch", "done", "giveup"].includes(f));
+
+  // --- Filtrage combiné ---
+  const finalResults = textResults.filter((item) => {
+    const typeMatch =
+      selectedTypeFiltres.length === 0 ||
+      selectedTypeFiltres.includes(item.type);
+    const statusMatch =
+      selectedStatusFiltres.length === 0 ||
+      selectedStatusFiltres.includes(item.status);
+    return typeMatch && statusMatch;
   });
 
-  let resultsNumber = document.getElementById("results-number");
+  // --- Mise à jour du DOM ---
+  let searchResultsNumber = 0;
+  // D'abord, on cache tout
+  contents.forEach((content) => (content.style.display = "none"));
 
-  if (searchResultsNumber == 0) {
-    resultsNumber.innerText = "aucun résultat";
+  // Ensuite, on affiche seulement les résultats
+  finalResults.forEach((item) => {
+    item.element.style.display = "block";
+    searchResultsNumber++;
+  });
+
+  // --- Mise à jour du compteur ---
+  const resultsNumberEl = document.getElementById("results-number");
+  if (searchResultsNumber === 0) {
+    resultsNumberEl.innerText = "aucun résultat";
   } else {
-    resultsNumber.innerText = searchResultsNumber + " résultats";
+    resultsNumberEl.innerText = `${searchResultsNumber} résultat${
+      searchResultsNumber > 1 ? "s" : ""
+    }`;
   }
 }
 
@@ -1067,6 +1044,8 @@ function updateContent(content) {
       if (!card) {
         element.children[0].innerHTML = contentInnerHTML(content);
       }
+
+      updateSearchIndex();
       search();
     }
   });
@@ -1081,6 +1060,7 @@ async function reloadList(hard = false) {
     addContentToList(content);
   });
 
+  updateSearchIndex();
   search();
 }
 

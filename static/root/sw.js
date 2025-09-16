@@ -163,6 +163,10 @@ if (workbox) {
       url: "/static/icons/view_list.svg",
       revision: null,
     },
+    {
+      url: "https://cdn.jsdelivr.net/npm/fuse.js@7.1.0",
+      revision: null,
+    },
   ]);
 
   // Mettre en cache toutes les ressources statiques : CSS, JS, images
