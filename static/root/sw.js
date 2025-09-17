@@ -164,7 +164,7 @@ if (workbox) {
       revision: null,
     },
     {
-      url: "https://cdn.jsdelivr.net/npm/fuse.js@7.1.0",
+      url: "/static/js/lib/fuse.js",
       revision: null,
     },
   ]);

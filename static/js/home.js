@@ -202,8 +202,6 @@ function search() {
     .map((f) => f.dataset.filtre)
     .filter((f) => ["onwatch", "towatch", "done", "giveup"].includes(f));
 
-  console.log(selectedStatusFiltres);
-
   // filters
   const finalResults = textResults.filter((item) => {
     const typeMatch =
