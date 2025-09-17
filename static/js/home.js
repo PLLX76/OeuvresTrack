@@ -161,7 +161,7 @@ function updateSearchIndex() {
   }));
 
   const fuseOptions = { keys: ["title"], includeScore: true, threshold: 0.4 };
-  fuse = new Fuse(itemsToSearch, fuseOptions); // On met à jour la variable globale
+  fuse = new Fuse(itemsToSearch, fuseOptions);
 }
 
 function search() {
@@ -170,10 +170,10 @@ function search() {
   const searchBarValue = document.getElementById("search").value;
   const contents = Array.from(document.getElementsByClassName("content"));
 
-  // --- Recherche textuelle avec Fuse.js ---
+  // --- search with Fuse.js ---
   let textResults;
   if (searchBarValue.trim() === "") {
-    // Si la barre de recherche est vide, on prend tous les éléments
+    // if search bar is empty, take all the element
     const itemsToSearch = contents.map((content) => ({
       title: content.querySelector("span").textContent,
       type: content.dataset.type,
@@ -183,20 +183,17 @@ function search() {
 
     textResults = itemsToSearch;
   } else {
-    // Sinon, on utilise Fuse.js
-    // .map(item => item.item) pour ne récupérer que l'objet original
     textResults = fuse.search(searchBarValue).map((result) => result.item);
   }
 
-  // --- Récupération des filtres (version plus moderne) ---
   const allFiltres = Array.from(
-    document.querySelectorAll(".filtres .selected")
+    document.querySelectorAll("#filtres .selected")
   );
 
   const selectedTypeFiltres = allFiltres
     .map((f) => f.dataset.filtre)
     .filter((f) => ["tv", "movie", "book", "books"].includes(f));
-  // Cas spécial pour 'book'
+
   if (selectedTypeFiltres.includes("book")) {
     selectedTypeFiltres.push("books");
   }
@@ -205,7 +202,9 @@ function search() {
     .map((f) => f.dataset.filtre)
     .filter((f) => ["onwatch", "towatch", "done", "giveup"].includes(f));
 
-  // --- Filtrage combiné ---
+  console.log(selectedStatusFiltres);
+
+  // filters
   const finalResults = textResults.filter((item) => {
     const typeMatch =
       selectedTypeFiltres.length === 0 ||
@@ -216,18 +215,17 @@ function search() {
     return typeMatch && statusMatch;
   });
 
-  // --- Mise à jour du DOM ---
   let searchResultsNumber = 0;
-  // D'abord, on cache tout
+
+  // Update Results
   contents.forEach((content) => (content.style.display = "none"));
 
-  // Ensuite, on affiche seulement les résultats
   finalResults.forEach((item) => {
     item.element.style.display = "block";
     searchResultsNumber++;
   });
 
-  // --- Mise à jour du compteur ---
+  // update counter
   const resultsNumberEl = document.getElementById("results-number");
   if (searchResultsNumber === 0) {
     resultsNumberEl.innerText = "aucun résultat";
