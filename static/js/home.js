@@ -1005,7 +1005,7 @@ function contentToHTML(content) {
 
     contentHTML = `<button class="content card" data-id="${content.id}" data-type="${content.type}" data-status="${content.status}">
       <img loading="lazy" src="${image}" alt="${content.catalog.title}" />
-      <h3>${content.catalog.title}</h3>
+      <h3><span>${content.catalog.title}</span></h3>
   </button>`;
   }
 
