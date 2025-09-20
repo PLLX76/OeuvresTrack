@@ -169,9 +169,6 @@ nav img {
 
   transition: background-color 0.25s ease, text-shadow 0.35s ease;
 }
-#sidebar *.filtre:hover {
-  text-shadow: 0 0 10px steelblue;
-}
 #filtres *.selected {
   background-color: lightskyblue;
 }

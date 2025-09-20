@@ -128,15 +128,13 @@ for (let i = 0; i < filtres.length; i++) {
       }
     }
 
-    var nb_selected = 0;
-    for (let j = 0; j < filtres.length; j++) {
-      if (filtres[j].classList.contains("selected")) nb_selected++;
-    }
+    filtres[0].classList.add("selected");
 
-    if (nb_selected == 0) {
-      filtres[0].classList.add("selected");
-    } else if (nb_selected > 1) {
-      filtres[0].classList.remove("selected");
+    for (let j = 1; j < filtres.length; j++) {
+      if (filtres[j].classList.contains("selected")) {
+        filtres[0].classList.remove("selected");
+        break;
+      }
     }
 
     search();
