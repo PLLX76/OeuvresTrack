@@ -1569,7 +1569,7 @@ def get_tierlist(user_id: int) -> dict:
                     "let": {"id": "$id"},
                     "pipeline": [
                         {"$match": {"$expr": {"$eq": ["$original_id", "$$id"]}}},
-                        {"$project": {"title": 1, "image": 1, "_id": 0}},
+                        {"$project": {"title": 1, "image": 1, "status": 1, "_id": 0}},
                     ],
                 }
             },
@@ -1578,6 +1578,7 @@ def get_tierlist(user_id: int) -> dict:
                 "$project": {
                     "rank": 1,
                     "type": 1,
+                    "status": 1,
                     "id": 1,
                     "catalog.title": 1,
                     "catalog.image": 1,
@@ -1608,6 +1609,7 @@ def get_tierlist(user_id: int) -> dict:
             {
                 "rank": ucatalog["rank"],
                 "type": ucatalog["type"],
+                "status": ucatalog["status"],
                 "id": ucatalog["id"],
                 "title": ucatalog["catalog"]["title"],
                 "image": ucatalog["catalog"]["image"],
