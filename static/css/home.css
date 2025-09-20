@@ -152,7 +152,8 @@ nav img {
   -ms-transform: translateX(-400px);
   transform: translateX(-400px);
 }
-*.filtre {
+#sidebar *.filtre,
+#tierlist-filters *.filtre {
   width: auto;
   min-width: 64px;
   height: 36px;

@@ -66,7 +66,6 @@ const sidebar = document.getElementById("sidebar");
 const closeBtn = document.getElementById("close-btn");
 const modalBack = document.getElementById("modal-back");
 const main = document.getElementById("main");
-const filtresDiv = document.getElementById("filtres");
 
 // modals
 const modalAdd = document.getElementById("modal-add");
@@ -112,32 +111,50 @@ window.addEventListener("resize", () => {
   prev_width = window.innerWidth;
 });
 
-const filtres = document.getElementsByClassName("filtre");
+const filtresDiv = document.getElementById("filtres");
+const filtresDivTerlist = document.getElementById("tierlist-filters");
+const filtres = filtresDiv.getElementsByClassName("filtre");
+const filtresTierlist = filtresDivTerlist.getElementsByClassName("filtre");
+
+function toggleFilter(i) {
+  if (filtres[i].classList.contains("selected")) {
+    filtres[i].classList.remove("selected");
+  } else {
+    filtres[i].classList.add("selected");
+
+    if (i == 0) {
+      for (let j = 1; j < filtres.length; j++) {
+        filtres[j].classList.remove("selected");
+      }
+    }
+  }
+
+  filtres[0].classList.add("selected");
+  filtresTierlist[0].classList.add("selected");
+
+  for (let j = 0; j < filtres.length; j++) {
+    if (filtres[j].classList.contains("selected")) {
+      if (j != 0) {
+        filtres[0].classList.remove("selected");
+        filtresTierlist[0].classList.remove("selected");
+      }
+
+      filtresTierlist[j].classList.add("selected");
+    } else {
+      filtresTierlist[j].classList.remove("selected");
+    }
+  }
+
+  search();
+}
 
 for (let i = 0; i < filtres.length; i++) {
   filtres[i].addEventListener("click", () => {
-    if (filtres[i].classList.contains("selected")) {
-      filtres[i].classList.remove("selected");
-    } else {
-      filtres[i].classList.add("selected");
-
-      if (i == 0) {
-        for (let j = 1; j < filtres.length; j++) {
-          filtres[j].classList.remove("selected");
-        }
-      }
-    }
-
-    filtres[0].classList.add("selected");
-
-    for (let j = 1; j < filtres.length; j++) {
-      if (filtres[j].classList.contains("selected")) {
-        filtres[0].classList.remove("selected");
-        break;
-      }
-    }
-
-    search();
+    toggleFilter(i);
+  });
+  filtresTierlist[i].addEventListener("click", () => {
+    toggleFilter(i);
+    applyFilterTierlist();
   });
 }
 
@@ -1336,11 +1353,12 @@ function openModalTierlist() {
         }
         container.insertAdjacentHTML(
           "beforeend",
-          `<button class="draggable" data-type="${catalog["type"]}" data-id="${catalog["id"]}" draggable="true"><img src="${image}" alt="${catalog["title"]} image" title="${catalog["title"]}"/></button>`
+          `<button class="draggable" data-type="${catalog["type"]}" data-id="${catalog["id"]}" data-status="${catalog["status"]}" draggable="true"><img src="${image}" alt="${catalog["title"]} image" title="${catalog["title"]}"/></button>`
         );
       });
     });
     initializeDraggables();
+    applyFilterTierlist();
   });
 
   modalTierlist.classList.add("open");

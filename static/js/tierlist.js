@@ -105,4 +105,43 @@ function sendRankUpdate(draggable) {
   haveSentRank = true;
 }
 
+function applyFilterTierlist() {
+  const draggables = document.querySelectorAll(".draggable");
+  const allFiltres = Array.from(
+    document.querySelectorAll("#filtres .selected")
+  );
+
+  const selectedTypeFiltres = allFiltres
+    .map((f) => f.dataset.filtre)
+    .filter((f) => ["tv", "movie", "book", "books"].includes(f));
+
+  if (selectedTypeFiltres.includes("book")) {
+    selectedTypeFiltres.push("books");
+  }
+
+  const selectedStatusFiltres = allFiltres
+    .map((f) => f.dataset.filtre)
+    .filter((f) => ["onwatch", "towatch", "done", "giveup"].includes(f));
+
+  draggables.forEach((draggable) => {
+    // check type
+    if (
+      selectedTypeFiltres.length == 0 ||
+      selectedTypeFiltres.includes(draggable.dataset.type)
+    ) {
+      // check status
+      if (
+        selectedStatusFiltres.length == 0 ||
+        selectedStatusFiltres.includes(draggable.dataset.status)
+      ) {
+        draggable.style.display = "block";
+      } else {
+        draggable.style.display = "none";
+      }
+    } else {
+      draggable.style.display = "none";
+    }
+  });
+}
+
 initializeDraggables();
