@@ -820,14 +820,17 @@ async function openModalEdit(data_id, data_type) {
   modalEditAddListener(type);
 }
 function closeAllModals(modify_history = false) {
+  let closeModalEditWasOpen = modalEdit.classList.contains("open");
   closeModalEditFunc(false);
 
   modalAdd.classList.remove("open");
   modalAdd.classList.remove("fullscreen");
   modalAdd.classList.remove("native");
 
-  modalTierlist.classList.remove("open");
-  modalTierlist.classList.remove("native");
+  if (!closeModalEditWasOpen) {
+    modalTierlist.classList.remove("open");
+    modalTierlist.classList.remove("native");
+  }
 
   if (modalSettings.classList.contains("open")) closeModalSettings(false);
 
