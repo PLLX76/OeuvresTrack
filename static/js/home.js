@@ -1357,6 +1357,7 @@ function openModalTierlist() {
         );
       });
     });
+
     initializeDraggables();
     applyFilterTierlist();
   });
