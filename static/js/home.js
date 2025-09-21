@@ -1448,6 +1448,8 @@ window.addEventListener("popstate", (e) => {
     } else {
       openModal(e.state.modal);
     }
+  } else {
+    closeAllModals();
   }
 });
 checkModalAlreadyOpen();
