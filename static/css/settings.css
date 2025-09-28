@@ -9,7 +9,7 @@
 #settings-contents {
   padding: 8px;
   font-family: "Poppins", sans-serif;
-  width: calc(100% - 15px);
+  width: calc(100% - 16px);
 }
 #settings-contents hr {
   margin: 20px 0;
@@ -122,6 +122,9 @@
   flex-direction: column;
   gap: 5px;
   width: 100%;
+
+  overflow-x: auto;
+  padding-bottom: 20px;
 }
 .settings-dictionary {
   display: -webkit-box;
