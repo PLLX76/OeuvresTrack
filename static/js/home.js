@@ -309,7 +309,7 @@ const modalAddSearch = document.querySelector("#modal-add-search");
 const modalAddResults = document.querySelector("#results");
 const modalAddTitle = document.getElementById("modal-add-title");
 
-function openModalAdd() {
+function openModalAdd(changeHistory = true) {
   modalAdd.classList.add("open");
   modalAdd.classList.remove("fullscreen");
   modalAddChoiceBtn.style.display = "block";
@@ -317,7 +317,9 @@ function openModalAdd() {
 
   modalAddTitle.innerHTML = "Ajouter des oeuvres";
 
-  window.history.pushState({ modal: "add" }, "", "/app/add");
+  if (changeHistory) {
+    window.history.pushState({ modal: "add" }, "", "/app/add");
+  }
 }
 
 BtnAdd.addEventListener("click", openModalAdd);
@@ -535,7 +537,7 @@ function modalEditAddListener(type) {
 const modalEditTitle = document.getElementById("modal-edit-title");
 const modalEditPicture = document.getElementById("modal-edit-picture");
 const modalEditElements = document.getElementById("elements");
-async function openModalEdit(data_id, data_type) {
+async function openModalEdit(data_id, data_type, changeHistory = true) {
   const id = data_id;
   const type = data_type;
 
@@ -812,11 +814,13 @@ async function openModalEdit(data_id, data_type) {
     modalEditElements.innerHTML = `<div class="element"><label class="element-header"><h3 class="roboto">${contentData.title}</h3><input type="checkbox" name="element-checkbox" id="element-checkbox" ${checked}></label></div>`;
   }
 
-  window.history.pushState(
-    { modal: "edit", id: data_id, type: data_type },
-    "",
-    "/app/" + data_type + "/" + data_id.toString() + "/"
-  );
+  if (changeHistory) {
+    window.history.pushState(
+      { modal: "edit", id: data_id, type: data_type },
+      "",
+      "/app/" + data_type + "/" + data_id.toString() + "/"
+    );
+  }
   modalEditAddListener(type);
 }
 function closeAllModals(modify_history = false) {
@@ -1324,7 +1328,7 @@ function getTierlist() {
     });
 }
 
-function openModalTierlist() {
+function openModalTierlist(changeHistory = true) {
   if (!modalTierlistAlreadyOpen) {
     let tierlistScript = document.createElement("script");
     tierlistScript.src = "/static/js/tierlist.js";
@@ -1366,7 +1370,9 @@ function openModalTierlist() {
   });
 
   modalTierlist.classList.add("open");
-  window.history.pushState({ modal: "tierlist" }, "", "/app/tierlist");
+  if (changeHistory) {
+    window.history.pushState({ modal: "tierlist" }, "", "/app/tierlist");
+  }
 }
 
 let modalTierlistAlreadyOpen = false;
@@ -1384,7 +1390,7 @@ const settingsBtn = document.getElementById("settings-btn");
 const modalSettingsClose = document.getElementById("close-modal-settings");
 
 let modalSettingsAlreadyOpen = false;
-function openModalSettings() {
+function openModalSettings(changeHistory = true) {
   if (!modalSettingsAlreadyOpen) {
     let settingsStyle = document.createElement("link");
     settingsStyle.rel = "stylesheet";
@@ -1398,7 +1404,9 @@ function openModalSettings() {
     modalSettingsAlreadyOpen = true;
   }
   modalSettings.classList.add("open");
-  window.history.pushState({ modal: "settings" }, "", "/app/settings");
+  if (changeHistory) {
+    window.history.pushState({ modal: "settings" }, "", "/app/settings");
+  }
 }
 
 settingsBtn.addEventListener("click", openModalSettings);
@@ -1429,24 +1437,24 @@ function checkModalAlreadyOpen() {
     openModalAdd();
   }
 }
-function openModal(name, id = null, type = null) {
+function openModal(name, changeHistory = true, id = null, type = null) {
   if (name === "settings") {
-    openModalSettings();
+    openModalSettings(changeHistory);
   } else if (name === "tierlist") {
-    openModalTierlist();
+    openModalTierlist(changeHistory);
   } else if (name === "edit") {
-    openModalEdit(id, type);
+    openModalEdit(id, type, changeHistory);
   } else if (name === "add") {
-    openModalAdd();
+    openModalAdd(changeHistory);
   }
 }
 window.addEventListener("popstate", (e) => {
   if (e.state) {
     closeAllModals();
     if (e.state.modal) {
-      openModal(e.state.modal, e.state.id, e.state.type);
+      openModal(e.state.modal, false, e.state.id, e.state.type);
     } else {
-      openModal(e.state.modal);
+      openModal(e.state.modal, false);
     }
   } else {
     closeAllModals();
